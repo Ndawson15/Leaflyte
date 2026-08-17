@@ -85,6 +85,7 @@ export default function Sidebar({
   treeRef.current = tree;
   const onMoveRef = useRef(onMove);
   onMoveRef.current = onMove;
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const pendingDrag = useRef<{
     path: string;
     kind: 'file' | 'folder';
@@ -97,7 +98,8 @@ export default function Sidebar({
   } | null>(null);
 
   const setVaultDragging = (active: boolean) => {
-    document.body.classList.toggle('is-vault-dragging', active);
+    sidebarRef.current?.classList.toggle('is-vault-dragging', active);
+    document.body.classList.remove('is-vault-dragging');
   };
 
   const clearTextSelection = () => {
@@ -195,11 +197,7 @@ export default function Sidebar({
   };
 
   useEffect(() => {
-    const onSelectStart = (e: Event) => {
-      const target = e.target as Node | null;
-      if (target && (target as Element).closest?.('.monaco-editor, .leaflyte-text-editor')) return;
-      if (pendingDrag.current?.active || dragPathRef.current) e.preventDefault();
-    };
+    document.body.classList.remove('is-vault-dragging');
 
     const activateDrag = (d: NonNullable<typeof pendingDrag.current>, e: globalThis.PointerEvent) => {
       if (d.active) return;
@@ -299,13 +297,13 @@ export default function Sidebar({
       setDropTarget(null);
     };
     window.addEventListener('blur', onBlur);
-    document.addEventListener('selectstart', onSelectStart);
+    document.addEventListener('visibilitychange', onBlur);
     return () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
       window.removeEventListener('blur', onBlur);
-      document.removeEventListener('selectstart', onSelectStart);
+      document.removeEventListener('visibilitychange', onBlur);
       setVaultDragging(false);
     };
     // handleMove/highlightFor read latest tree via treeRef
@@ -374,7 +372,7 @@ export default function Sidebar({
   }
 
   return (
-    <div className="h-full flex flex-col bg-surface font-sans text-[13px]">
+    <div ref={sidebarRef} data-vault-sidebar className="h-full flex flex-col bg-surface font-sans text-[13px]">
       <div className="titlebar-left shrink-0 border-b border-border/60">
         <div className="titlebar-traffic-spacer shrink-0" aria-hidden />
         <div className="titlebar-brand flex shrink-0 items-center gap-1.5 px-1.5">

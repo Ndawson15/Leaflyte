@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   }
 };
 
-const themeBoot = `(function(){try{var t=localStorage.getItem('leaflyte.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+const themeBoot = `(function(){try{var t=localStorage.getItem('leaflyte.theme');if(t)document.documentElement.setAttribute('data-theme',t);document.body.classList.remove('is-vault-dragging');}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

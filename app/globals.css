@@ -226,9 +226,17 @@ html.tauri-overlay .titlebar-traffic-spacer {
   cursor: pointer;
   color: var(--cv-text);
   position: relative;
+}
+
+[data-vault-sidebar].is-vault-dragging .tree-row {
   -webkit-user-select: none;
   user-select: none;
   touch-action: none;
+  cursor: grabbing;
+}
+
+[data-vault-sidebar].is-vault-dragging {
+  cursor: grabbing;
 }
 
 .tree-row .row-actions {
@@ -287,20 +295,5 @@ html.tauri-overlay .titlebar-traffic-spacer {
 body.is-resizing,
 body.is-resizing * {
   cursor: col-resize !important;
-  user-select: none !important;
-}
-
-body.is-vault-dragging .monaco-editor,
-body.is-vault-dragging .monaco-editor *,
-body.is-vault-dragging .leaflyte-text-editor,
-body.is-vault-dragging .leaflyte-text-editor * {
-  -webkit-user-select: text !important;
-  user-select: text !important;
-}
-
-body.is-vault-dragging,
-body.is-vault-dragging * {
-  cursor: grabbing !important;
-  -webkit-user-select: none !important;
   user-select: none !important;
 }

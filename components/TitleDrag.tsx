@@ -13,7 +13,6 @@ export default function TitleDrag({ className = '' }: { className?: string }) {
       onMouseDown={(e) => {
         if (!isTauri() || e.button !== 0) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE)) return;
-        e.preventDefault();
         void (async () => {
           const { getCurrentWindow } = await import('@tauri-apps/api/window');
           const win = getCurrentWindow();

@@ -5,7 +5,6 @@ import { APP_NAME, APP_VERSION } from '@/lib/appInfo';
 import AppLogo from '@/components/AppLogo';
 import { THEMES } from '@/lib/themes';
 import { SHORTCUT_ACTIONS, conflictFor, formatChord, type ActionId } from '@/lib/shortcuts';
-import ConfirmDialog from '@/components/ConfirmDialog';
 import { readLocal, writeLocal } from '@/lib/storage';
 import { useTheme } from './ThemeProvider';
 import ThemeColorEditor from '@/components/ThemeColorEditor';
@@ -116,9 +115,6 @@ function GeneralPanel({
   vaultPath: string | null;
   onNotice?: (message: string) => void;
 }) {
-  const { resetFirstRunSetup } = useWorkspaces();
-  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
-
   return (
     <div className="space-y-8">
       <SettingsSection title="About" description="Leaflyte on this device.">
@@ -143,32 +139,7 @@ function GeneralPanel({
         </div>
       </SettingsSection>
 
-      <SettingsSection
-        title="Testing"
-        description="Reset first-run setup to test the welcome screen again. Your notes on disk are not deleted."
-      >
-        <button
-          type="button"
-          onClick={() => setResetConfirmOpen(true)}
-          className="rounded-md border border-border px-3 py-2 text-sm text-muted hover:text-text hover:border-muted hover:bg-surface2"
-        >
-          Reset first-run setup
-        </button>
-      </SettingsSection>
-
-      {resetConfirmOpen && (
-        <ConfirmDialog
-          title="Reset first-run setup?"
-          message="Clear saved workspace preferences and show the welcome screen again. Your note files on disk are not deleted."
-          confirmLabel="Reset"
-          danger
-          onCancel={() => setResetConfirmOpen(false)}
-          onConfirm={() => {
-            setResetConfirmOpen(false);
-            resetFirstRunSetup();
-          }}
-        />
-      )}
+      <p className="text-xs text-muted pt-2 border-t border-border">Built with vibes by Noah Dawson</p>
     </div>
   );
 }

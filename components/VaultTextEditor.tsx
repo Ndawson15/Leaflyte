@@ -64,7 +64,9 @@ const VaultTextEditor = forwardRef<
         const text = e.clipboardData.getData('text/plain');
         document.execCommand('insertText', false, text);
       }}
-      onMouseDown={(e) => e.stopPropagation()}
+      onMouseDown={() => {
+        requestAnimationFrame(() => editorRef.current?.focus());
+      }}
     />
   );
 });
