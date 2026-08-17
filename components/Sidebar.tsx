@@ -12,15 +12,12 @@ import {
 } from 'lucide-react';
 import type { TreeNode } from '@/lib/vault';
 import { destinationForDrop, dropTargetFromEvent, isInvalidMove, joinPath, parentDir, rewritePath, basename, type DropTarget } from '@/lib/paths';
-import { dispatchAiDropHover, dispatchAiTagFile } from '@/lib/ai/mentions';
 import FileTypeIcon from '@/components/FileTypeIcon';
 import TitleDrag from '@/components/TitleDrag';
 import UpdateButton from '@/components/UpdateButton';
 import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
 
 const ICON = { size: 15, strokeWidth: 1.75, className: 'shrink-0' as const };
-const VAULT_POINTER_DRAG_ENABLED = false;
-
 type Creating = { parent: string; kind: 'file' | 'folder' };
 
 interface SidebarProps {
@@ -182,7 +179,6 @@ export default function Sidebar({
     e: PointerEvent,
     node: { path: string; type: 'file' | 'folder'; name: string }
   ) => {
-    if (!VAULT_POINTER_DRAG_ENABLED) return;
     if (e.button !== 0) return;
     if ((e.target as HTMLElement).closest('button')) return;
     pendingDrag.current = {
@@ -199,7 +195,6 @@ export default function Sidebar({
 
   useEffect(() => {
     document.body.classList.remove('is-vault-dragging');
-    if (!VAULT_POINTER_DRAG_ENABLED) return;
 
     const activateDrag = (d: NonNullable<typeof pendingDrag.current>, e: globalThis.PointerEvent) => {
       if (d.active) return;
@@ -233,19 +228,9 @@ export default function Sidebar({
       activateDrag(d, e);
       if (dragPathRef.current !== d.path) setDragging(d.path);
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      const aiDrop = el?.closest('[data-ai-drop]');
-      const mainCol = el?.closest('[data-main-column]');
-      const bottomAiDrop =
-        d.kind === 'file' &&
-        mainCol &&
-        !aiDrop &&
-        (() => {
-          const rect = mainCol.getBoundingClientRect();
-          return e.clientY >= rect.bottom - 140;
-        })();
-      dispatchAiDropHover(!!aiDrop || !!bottomAiDrop);
-      const target = dropTargetFromEvent({ target: el });
-      setDropTarget(highlightFor(d.path, target));
+      const inVault = el?.closest('[data-vault-sidebar]');
+      const target = inVault ? dropTargetFromEvent({ target: el }) : null;
+      setDropTarget(target ? highlightFor(d.path, target) : null);
       setGhost({ x: e.clientX, y: e.clientY, name: d.name });
       e.preventDefault();
     };
@@ -260,33 +245,15 @@ export default function Sidebar({
       setGhost(null);
       if (!d.active) {
         endDrag(d);
-        dispatchAiDropHover(false);
         setDragging(null);
         setDropTarget(null);
         return;
       }
       suppressClickRef.current = true;
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      const aiDrop = el?.closest('[data-ai-drop]');
-      const mainCol = el?.closest('[data-main-column]');
-      const bottomAiDrop =
-        d.kind === 'file' &&
-        mainCol &&
-        !aiDrop &&
-        (() => {
-          const rect = mainCol.getBoundingClientRect();
-          return e.clientY >= rect.bottom - 140;
-        })();
-      if ((aiDrop || bottomAiDrop) && d.kind === 'file') {
-        dispatchAiTagFile(d.path);
-        dispatchAiDropHover(false);
-        endDrag(d);
-        setDragging(null);
-        setDropTarget(null);
-        return;
+      if (el?.closest('[data-vault-sidebar]')) {
+        handleMove(d.path, dropTargetFromEvent({ target: el }));
       }
-      handleMove(d.path, dropTargetFromEvent({ target: el }));
-      dispatchAiDropHover(false);
       endDrag(d);
       setDragging(null);
       setDropTarget(null);
@@ -299,7 +266,6 @@ export default function Sidebar({
       pendingDrag.current = null;
       setGhost(null);
       endDrag(null);
-      dispatchAiDropHover(false);
       setDragging(null);
       setDropTarget(null);
     };

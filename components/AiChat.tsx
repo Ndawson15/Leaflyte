@@ -33,8 +33,6 @@ export default function AiChat({
   onOpenSettings,
   onPreviewFileEdit,
   onOpenFile,
-  pendingTags,
-  onPendingTagsConsumed,
   editStates,
   onEditState
 }: {
@@ -46,8 +44,6 @@ export default function AiChat({
   onOpenSettings: () => void;
   onPreviewFileEdit: (editKey: string, path: string, content: string) => Promise<void>;
   onOpenFile?: (path: string) => void;
-  pendingTags?: string[];
-  onPendingTagsConsumed?: () => void;
   editStates: Record<string, AiEditStatus>;
   onEditState: (key: string, status: AiEditStatus) => void;
 }) {
@@ -314,8 +310,8 @@ export default function AiChat({
             {config.allowEdits
               ? ' When you ask for changes, click Preview to open the edit in the editor — approve or revert from there.'
               : ''}{' '}
-            Type <kbd className="px-1 py-0.5 bg-surface2 rounded text-[10px]">@</kbd> or drag files from the vault
-            sidebar to tag them for context. Chats are saved on this device.
+            Type <kbd className="px-1 py-0.5 bg-surface2 rounded text-[10px]">@</kbd> to tag files for context.
+            Chats are saved on this device.
           </p>
         )}
         {messages.map((m, i) => (
@@ -356,8 +352,6 @@ export default function AiChat({
         files={files}
         loading={loading}
         configured={configured}
-        pendingTags={pendingTags}
-        onPendingTagsConsumed={onPendingTagsConsumed}
         onSubmit={submit}
         onKeyDownExtra={onKeyDownExtra}
         requestFocus={open}

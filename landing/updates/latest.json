@@ -1,11 +1,11 @@
 {
-  "version": "0.2.5",
-  "notes": "Fix Monaco typing and caret placement on macOS, add the compact titlebar update button, and simplify General settings.",
-  "pub_date": "2026-08-17T18:37:08.987Z",
+  "version": "0.2.6",
+  "notes": "Restore vault drag-and-drop for organizing notes and folders, add syntax highlighting by file type, and use @ mentions for AI context.",
+  "pub_date": "2026-08-17T19:02:33.065Z",
   "platforms": {
     "darwin-aarch64": {
-      "url": "https://leaflyte.app/updates/releases/v0.2.5/Leaflyte.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHazN5VnNBY0JJcW14Ukp6bDV4Mm1BbHRqdFFZMFJJTFhhekE5VUZFWkhJSFFkWjEzT0lWZW1TWHhocmJEZFVqbHlxZFRvUE4vSjd1M0cwYnBjSmxnS2dvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTkxNzc4CWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negorUHFUcGtUaVE4Mnk2QnFvQ29aQzQvZVZkaXA4MlY4aExaOHpxbmp4YWFpMTBXTnc2SHZrYjVhckJHU3RBKzRZc3ZTVGx4UDNyL0NDVGltUEJMUGNDQT09Cg=="
+      "url": "https://leaflyte.app/updates/releases/v0.2.6/Leaflyte.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHa3cvNGdDQVA3eTc1bkVLbGs0N2IxMkhZbUNyM2xYalFvOE42TnJiUEpzcGQxOHFnRzlZVERTZ1ZuZHdHa1RZakpNZ0MzeTNxVzA1TmlBQURIV2hZMEFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTkzMzM1CWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negpEYUVRUHFJSTBta3hUVHk0UmNhSk5jNEJpbjVvb0swZEZYc1BhZTRPU0xGazQrZHJ3bWNmL2dsd0RyUnpQcndmTHpCeXZpYlVxci9EcHlzNHBCM1ZCdz09Cg=="
     }
   }
 }

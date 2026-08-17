@@ -1,6 +1,6 @@
 [package]
 name = "leaflyte"
-version = "0.2.5"
+version = "0.2.6"
 description = "Local notes vault"
 edition = "2021"
 rust-version = "1.77.2"

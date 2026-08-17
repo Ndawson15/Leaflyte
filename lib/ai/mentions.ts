@@ -2,10 +2,6 @@ import { basename } from '@/lib/paths';
 import { isProbablyText } from '@/lib/fileKind';
 import type { ChatMessage } from '@/lib/ai/chat';
 
-export const VAULT_PATH_MIME = 'application/x-leaflyte-vault-path';
-export const AI_TAG_FILE_EVENT = 'leaflyte:ai-tag-file';
-export const AI_DROP_HOVER_EVENT = 'leaflyte:ai-drop-hover';
-
 export function mentionQueryAt(text: string, cursor: number): { query: string; at: number } | null {
   const before = text.slice(0, cursor);
   const match = /(?:^|[\s(])@([^\s@]*)$/.exec(before);
@@ -54,12 +50,4 @@ export function collectTaggedPaths(messages: ChatMessage[]): string[] {
     if (message.attachments) paths.push(...message.attachments);
   }
   return [...new Set(paths)];
-}
-
-export function dispatchAiTagFile(path: string) {
-  window.dispatchEvent(new CustomEvent(AI_TAG_FILE_EVENT, { detail: { path } }));
-}
-
-export function dispatchAiDropHover(active: boolean) {
-  window.dispatchEvent(new CustomEvent(AI_DROP_HOVER_EVENT, { detail: { active } }));
 }

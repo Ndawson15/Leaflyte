@@ -46,7 +46,6 @@ import {
   isMarkdownViewMode,
   type MarkdownViewMode
 } from '@/lib/themes';
-import { AI_TAG_FILE_EVENT } from '@/lib/ai/mentions';
 import type { AiEditPreviewSession, AiEditStatus } from '@/lib/ai/preview';
 
 function flatten(nodes: TreeNode[]): string[] {
@@ -72,7 +71,6 @@ export default function Home() {
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [aiChatOpen, setAiChatOpen] = useState(false);
-  const [aiPendingTags, setAiPendingTags] = useState<string[]>([]);
   const [aiEditStates, setAiEditStates] = useState<Record<string, AiEditStatus>>({});
   const [aiEditPreview, setAiEditPreview] = useState<AiEditPreviewSession | null>(null);
   const [editorEpoch, setEditorEpoch] = useState(0);
@@ -182,17 +180,6 @@ export default function Home() {
     vaultInitRef.current = false;
     setPanel('editor');
   }, [needsSetup]);
-
-  useEffect(() => {
-    const onTagFile = (e: Event) => {
-      const path = (e as CustomEvent<{ path: string }>).detail?.path;
-      if (!path) return;
-      setAiChatOpen(true);
-      setAiPendingTags((prev) => (prev.includes(path) ? prev : [...prev, path]));
-    };
-    window.addEventListener(AI_TAG_FILE_EVENT, onTagFile);
-    return () => window.removeEventListener(AI_TAG_FILE_EVENT, onTagFile);
-  }, []);
 
   useEffect(() => {
     if (!ready || !workspace || vaultInitRef.current) return;
@@ -850,8 +837,6 @@ export default function Home() {
           onOpenSettings={() => setPanel('settings')}
           onPreviewFileEdit={startAiEditPreview}
           onOpenFile={(path) => openFile(path, true)}
-          pendingTags={aiPendingTags}
-          onPendingTagsConsumed={() => setAiPendingTags([])}
           editStates={aiEditStates}
           onEditState={setAiEditState}
         />

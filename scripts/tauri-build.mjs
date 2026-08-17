@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { homedir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,7 +17,7 @@ const env = {
   ...process.env,
   TAURI_SIGNING_PRIVATE_KEY: readFileSync(keyPath, 'utf8').trim(),
   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ?? '',
-  PATH: `${process.env.HOME}/.cargo/bin:${process.env.PATH ?? ''}`
+  PATH: `${path.join(homedir(), '.cargo', 'bin')}${path.delimiter}${process.env.PATH ?? ''}`
 };
 
 const result = spawnSync('tauri', ['build'], {

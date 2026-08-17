@@ -1,15 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FileText, Send, X } from 'lucide-react';
+import { Send, X } from 'lucide-react';
 import { basename } from '@/lib/paths';
-import {
-  AI_DROP_HOVER_EVENT,
-  filterMentionFiles,
-  mentionQueryAt,
-  removeMentionTrigger,
-  VAULT_PATH_MIME
-} from '@/lib/ai/mentions';
+import { filterMentionFiles, mentionQueryAt, removeMentionTrigger } from '@/lib/ai/mentions';
 import { isProbablyText } from '@/lib/fileKind';
 import FileTypeIcon from '@/components/FileTypeIcon';
 
@@ -21,8 +15,6 @@ export default function AiChatInput({
   files,
   loading,
   configured,
-  pendingTags,
-  onPendingTagsConsumed,
   onSubmit,
   onKeyDownExtra,
   requestFocus
@@ -34,8 +26,6 @@ export default function AiChatInput({
   files: string[];
   loading: boolean;
   configured: boolean;
-  pendingTags?: string[];
-  onPendingTagsConsumed?: () => void;
   onSubmit: () => void;
   onKeyDownExtra?: (e: React.KeyboardEvent) => boolean | void;
   requestFocus?: boolean;
@@ -43,7 +33,6 @@ export default function AiChatInput({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [cursorPos, setCursorPos] = useState(0);
   const [mentionIndex, setMentionIndex] = useState(0);
-  const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
     if (requestFocus) inputRef.current?.focus();
@@ -69,25 +58,6 @@ export default function AiChatInput({
     [onTaggedPathsChange, taggedPaths]
   );
 
-  useEffect(() => {
-    if (!pendingTags?.length) return;
-    const next = [...taggedPaths];
-    for (const path of pendingTags) {
-      if (files.includes(path) && isProbablyText(path) && !next.includes(path)) next.push(path);
-    }
-    if (next.length !== taggedPaths.length) onTaggedPathsChange(next);
-    onPendingTagsConsumed?.();
-    inputRef.current?.focus();
-  }, [pendingTags, files, taggedPaths, onTaggedPathsChange, onPendingTagsConsumed]);
-
-  useEffect(() => {
-    const onHover = (e: Event) => {
-      setDragOver(!!(e as CustomEvent<{ active: boolean }>).detail?.active);
-    };
-    window.addEventListener(AI_DROP_HOVER_EVENT, onHover);
-    return () => window.removeEventListener(AI_DROP_HOVER_EVENT, onHover);
-  }, []);
-
   const mention = mentionQueryAt(value, cursorPos);
   const candidates = useMemo(
     () => (mention ? filterMentionFiles(mention.query, files) : []),
@@ -109,19 +79,6 @@ export default function AiChatInput({
       setCursorPos(next.cursor);
       inputRef.current?.focus();
     });
-  };
-
-  const readVaultPath = (dt: DataTransfer): string | null => {
-    const path = dt.getData(VAULT_PATH_MIME) || dt.getData('text/plain');
-    if (!path || !files.includes(path)) return null;
-    return path;
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const path = readVaultPath(e.dataTransfer);
-    if (path) addTag(path);
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -161,29 +118,7 @@ export default function AiChatInput({
   };
 
   return (
-    <div
-      data-ai-drop
-      className={`shrink-0 border-t border-border p-3 transition-colors ${
-        dragOver ? 'bg-amber/5 ring-1 ring-inset ring-amber/30' : ''
-      }`}
-      onDragEnter={(e) => {
-        if (readVaultPath(e.dataTransfer)) {
-          e.preventDefault();
-          setDragOver(true);
-        }
-      }}
-      onDragOver={(e) => {
-        if (readVaultPath(e.dataTransfer)) {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'copy';
-          setDragOver(true);
-        }
-      }}
-      onDragLeave={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOver(false);
-      }}
-      onDrop={onDrop}
-    >
+    <div className="shrink-0 border-t border-border p-3">
       {taggedPaths.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
           {taggedPaths.map((path) => (
@@ -249,7 +184,7 @@ export default function AiChatInput({
           rows={2}
           placeholder={
             configured
-              ? 'Ask about your notes… type @ to tag a file, or drag one here'
+              ? 'Ask about your notes… type @ to tag a file'
               : 'Add an API key in Settings → AI first'
           }
           disabled={loading}
@@ -265,12 +200,6 @@ export default function AiChatInput({
           <Send size={15} strokeWidth={1.75} />
         </button>
       </div>
-      {dragOver && (
-        <p className="mt-2 text-[10px] text-amber flex items-center gap-1">
-          <FileText size={12} />
-          Drop to tag file for AI context
-        </p>
-      )}
     </div>
   );
 }
