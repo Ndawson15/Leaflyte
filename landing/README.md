@@ -15,7 +15,7 @@ Hostinger’s auto-diagnosis often says “use Next.js” — **ignore that** fo
 | **Framework preset** | **Other** | Not Next.js — this is plain HTML, not the desktop app |
 | **Root directory** | **`landing`** | Keeps build scoped to the marketing site |
 | **Build command** | **`build`** | Runs `node scripts/build.mjs` |
-| **Output directory** | **`build`** | At **repo root** (`/build`), not `landing/build` |
+| **Output directory** | **`build`** | Relative to **`landing/`** → `landing/build/` |
 | **Entry file** | *(empty)* | Static site — no Node server |
 | **Node version** | 22.x | |
 | **Branch** | `main` | |
@@ -31,8 +31,8 @@ If Framework is left on **Next.js**, Hostinger looks for **`.next`** and deploy 
 
 ```bash
 cd landing && npm run build
-ls ../build/index.html   # output is at repo root build/
-npx --yes serve ../build
+ls build/index.html   # output is landing/build/
+npx --yes serve build
 ```
 
 ## Preview without build

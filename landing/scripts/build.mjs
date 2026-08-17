@@ -3,10 +3,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const landingRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const repoRoot = join(landingRoot, '..');
 
-// Hostinger resolves the output directory from the repository root, not landing/.
-const out = join(repoRoot, 'build');
+// Hostinger output directory is relative to the app root (landing/), not repo root.
+const out = join(landingRoot, 'build');
 
 const staticPaths = ['index.html', 'styles.css', 'assets', 'downloads'];
 
