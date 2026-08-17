@@ -27,8 +27,8 @@ export function supportsReadView(path: string): boolean {
   return isMarkdownLikePath(path) || isHtmlPath(path);
 }
 
-export function defaultFileViewMode(path: string): 'read' | 'edit' {
-  return supportsReadView(path) ? 'read' : 'edit';
+export function defaultFileViewMode(_path: string): 'read' | 'edit' {
+  return 'edit';
 }
 
 export function isProbablyText(path: string): boolean {

@@ -282,6 +282,12 @@ body.is-resizing * {
   user-select: none !important;
 }
 
+body.is-vault-dragging .monaco-editor,
+body.is-vault-dragging .monaco-editor * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
 body.is-vault-dragging,
 body.is-vault-dragging * {
   cursor: grabbing !important;

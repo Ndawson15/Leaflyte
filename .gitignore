@@ -2,6 +2,7 @@
 node_modules
 .next
 out
+public/monaco
 .api-hidden
 next-env.d.ts
 tsconfig.tsbuildinfo
@@ -11,6 +12,7 @@ tsconfig.tsbuildinfo
 
 # Tauri / Rust
 src-tauri/target/
+src-tauri/.tauri-signing.key
 
 # Local dev vault (your notes — not part of the app source)
 vault/

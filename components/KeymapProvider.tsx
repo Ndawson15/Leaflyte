@@ -77,6 +77,18 @@ export function KeymapProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (e.repeat) return;
+
+      const target = e.target as HTMLElement | null;
+      const inEditable =
+        !!target?.closest('.monaco-editor') ||
+        !!target?.closest('.leaflyte-text-editor') ||
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable;
+
+      // Never intercept plain typing in an editor field — only shortcut chords.
+      if (inEditable && !e.metaKey && !e.ctrlKey && !e.altKey) return;
+
       for (const [id, chord] of Object.entries(bindingsRef.current) as [ActionId, Chord][]) {
         if (!matchesChord(e, chord)) continue;
         const handler = handlers.current.get(id);

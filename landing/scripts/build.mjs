@@ -7,7 +7,7 @@ const landingRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 // Hostinger output directory is relative to the app root (landing/), not repo root.
 const out = join(landingRoot, 'build');
 
-const staticPaths = ['index.html', 'styles.css', 'assets', 'downloads'];
+const staticPaths = ['index.html', 'styles.css', 'assets', 'downloads', 'updates'];
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });

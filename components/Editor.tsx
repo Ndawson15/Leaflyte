@@ -1,8 +1,8 @@
 'use client';
 
-import MonacoEditor from '@monaco-editor/react';
 import { Eye, Pencil } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import MonacoSurface from '@/components/MonacoSurface';
 import { languageForPath } from '@/lib/languageMap';
 import { attachWikiLinkDecorations, ensureWikiLinkSupport } from '@/lib/wikiLinkMonaco';
 import { ensureMonacoThemes, registerCustomMonacoTheme } from '@/lib/monacoThemes';
@@ -12,9 +12,11 @@ import { supportsReadView } from '@/lib/fileKind';
 import { resolveWikiTarget } from '@/lib/wikiLinks';
 import type { MarkdownViewMode } from '@/lib/themes';
 import FilePreview from '@/components/FilePreview';
+import VaultTextEditor from '@/components/VaultTextEditor';
 import { useShortcut } from './KeymapProvider';
 import TitleDrag from '@/components/TitleDrag';
 import * as vault from '@/lib/vaultClient';
+import { isTauri } from '@/lib/vaultClient';
 
 interface EditorProps {
   path: string;
@@ -34,13 +36,14 @@ export default function Editor({
   content,
   allFiles,
   fileContents,
-  fileViewMode = 'read',
+  fileViewMode = 'edit',
   onFileViewModeChange,
   onSave,
   onLiveChange,
   onNavigate,
   onCreateLink
 }: EditorProps) {
+  const useNativeTextEditor = isTauri();
   const { themeColors, hasCustomColors, monacoTheme, theme } = useTheme();
   const [value, setValue] = useState(content);
   const [status, setStatus] = useState<'saved' | 'unsaved' | 'saving'>('saved');
@@ -161,9 +164,22 @@ export default function Editor({
             readFile={readVaultFile}
             onWikiNavigate={handleWikiNavigate}
           />
+        ) : useNativeTextEditor ? (
+          <div className="min-h-0 h-full">
+            <VaultTextEditor
+              key={path}
+              path={path}
+              value={value}
+              onChange={(next) => {
+                setValue(next);
+                onLiveChange(path, next);
+                scheduleSave(next);
+              }}
+            />
+          </div>
         ) : (
           <div className="min-h-0 h-full">
-            <MonacoEditor
+            <MonacoSurface
               key={path}
               height="100%"
               theme={monacoTheme}
@@ -184,6 +200,11 @@ export default function Editor({
                 }
                 wikiLinksRef.current?.dispose();
                 wikiLinksRef.current = attachWikiLinkDecorations(monaco, editor, wikiContext);
+                editor.updateOptions({ readOnly: false, domReadOnly: false });
+                const focus = () => editor.focus();
+                focus();
+                requestAnimationFrame(focus);
+                editor.getContainerDomNode().addEventListener('mousedown', focus);
               }}
               onChange={(v) => {
                 const next = v ?? '';
@@ -199,7 +220,8 @@ export default function Editor({
                 wordWrap: 'on',
                 scrollBeyondLastLine: false,
                 automaticLayout: true,
-                links: true
+                links: true,
+                readOnly: false
               }}
             />
           </div>

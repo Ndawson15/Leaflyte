@@ -1,6 +1,6 @@
 {
   "name": "leaflyte",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 1420",
@@ -10,11 +10,14 @@
     "lint": "next lint",
     "tauri": "tauri",
     "tauri:dev": "PATH=\"$HOME/.cargo/bin:$PATH\" tauri dev",
-    "tauri:build": "PATH=\"$HOME/.cargo/bin:$PATH\" tauri build"
+    "tauri:build": "node scripts/tauri-build.mjs",
+    "publish:update": "node scripts/publish-update.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
     "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-updater": "^2.10.1",
     "lucide-react": "^1.31.0",
     "next": "^16.3.1",
     "react": "^19.2.8",

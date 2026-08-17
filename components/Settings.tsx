@@ -15,6 +15,7 @@ import { AI_PROVIDERS, type AiProvider } from '@/lib/ai/config';
 import AiModelSelect from '@/components/AiModelSelect';
 import WorkspacePanel from '@/components/WorkspacePanel';
 import { useWorkspaces } from '@/components/WorkspaceProvider';
+import { UpdateSettingsRow } from '@/components/UpdateNotifier';
 
 const SETTINGS_TAB_KEY = 'leaflyte.settingsTab';
 
@@ -86,7 +87,13 @@ export default function Settings({
 
         <div className="flex-1 min-w-0 overflow-y-auto">
           <div className="max-w-2xl px-8 py-8">
-            {tab === 'general' && <GeneralPanel workspaceName={workspace?.name ?? null} vaultPath={workspace?.vaultPath ?? null} />}
+            {tab === 'general' && (
+              <GeneralPanel
+                workspaceName={workspace?.name ?? null}
+                vaultPath={workspace?.vaultPath ?? null}
+                onNotice={onNotice}
+              />
+            )}
             {tab === 'workspaces' && (
               <WorkspacesSettingsPanel onSwitch={onSwitchWorkspace} onNotice={onNotice} />
             )}
@@ -102,10 +109,12 @@ export default function Settings({
 
 function GeneralPanel({
   workspaceName,
-  vaultPath
+  vaultPath,
+  onNotice
 }: {
   workspaceName: string | null;
   vaultPath: string | null;
+  onNotice?: (message: string) => void;
 }) {
   const { resetFirstRunSetup } = useWorkspaces();
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
@@ -113,14 +122,17 @@ function GeneralPanel({
   return (
     <div className="space-y-8">
       <SettingsSection title="About" description="Leaflyte on this device.">
-        <div className="border border-border rounded-lg bg-surface">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <AppLogo size={28} alt="" />
-            <div className="min-w-0">
-              <div className="text-sm text-text font-medium">{APP_NAME}</div>
-              <div className="text-[11px] text-muted">v{APP_VERSION}</div>
+        <div className="space-y-3">
+          <div className="border border-border rounded-lg bg-surface">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <AppLogo size={28} alt="" />
+              <div className="min-w-0">
+                <div className="text-sm text-text font-medium">{APP_NAME}</div>
+                <div className="text-[11px] text-muted">v{APP_VERSION}</div>
+              </div>
             </div>
           </div>
+          <UpdateSettingsRow onNotice={onNotice} />
         </div>
       </SettingsSection>
 

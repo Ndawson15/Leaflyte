@@ -1,12 +1,12 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Leaflyte",
-  "version": "0.2.0",
-  "identifier": "com.leaflyte.app",
+  "version": "0.2.1",
+  "identifier": "com.leaflyte.desktop",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://127.0.0.1:1420",
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "node scripts/copy-monaco.mjs && npm run dev",
     "beforeBuildCommand": "npm run build:tauri"
   },
   "app": {
@@ -37,6 +37,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": "all",
     "icon": [
       "icons/icon.png",
@@ -46,5 +47,14 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkzMDY3MjY2NUQxMTI3MEUKUldRT0p4RmRabklHazJ1a3BpOGlkc085Zi9pbXY0SDRNeWthK203NUxPdGM2dmdsUDZVTGM1VkEK",
+      "endpoints": ["https://leaflyte.app/updates/latest.json"],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

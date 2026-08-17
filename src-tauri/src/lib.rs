@@ -1,4 +1,5 @@
 mod ai;
+mod menu;
 mod vault;
 mod watcher;
 
@@ -7,6 +8,8 @@ use vault::VaultState;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(VaultState::new())
         .invoke_handler(tauri::generate_handler![
             vault::get_vault_path,
@@ -24,6 +27,7 @@ pub fn run() {
             ai::list_ai_models
         ])
         .setup(|app| {
+            menu::install_app_menu(app)?;
             if cfg!(debug_assertions) {
                 app.handle().plugin(
                     tauri_plugin_log::Builder::default()

@@ -196,6 +196,8 @@ export default function Sidebar({
 
   useEffect(() => {
     const onSelectStart = (e: Event) => {
+      const target = e.target as Node | null;
+      if (target && (target as Element).closest?.('.monaco-editor')) return;
       if (pendingDrag.current?.active || dragPathRef.current) e.preventDefault();
     };
 
@@ -288,11 +290,21 @@ export default function Sidebar({
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
+    const onBlur = () => {
+      pendingDrag.current = null;
+      setGhost(null);
+      endDrag(null);
+      dispatchAiDropHover(false);
+      setDragging(null);
+      setDropTarget(null);
+    };
+    window.addEventListener('blur', onBlur);
     document.addEventListener('selectstart', onSelectStart);
     return () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
+      window.removeEventListener('blur', onBlur);
       document.removeEventListener('selectstart', onSelectStart);
       setVaultDragging(false);
     };

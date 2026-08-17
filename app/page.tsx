@@ -14,6 +14,7 @@ import ResizeHandle from '@/components/ResizeHandle';
 import Settings from '@/components/Settings';
 import AiChat from '@/components/AiChat';
 import { AiEditReviewBar } from '@/components/AiEditProposal';
+import UpdateNotifier from '@/components/UpdateNotifier';
 import AppLogo from '@/components/AppLogo';
 import TitleDrag from '@/components/TitleDrag';
 import { APP_NAME } from '@/lib/appInfo';
@@ -76,7 +77,7 @@ export default function Home() {
   const [aiEditStates, setAiEditStates] = useState<Record<string, AiEditStatus>>({});
   const [aiEditPreview, setAiEditPreview] = useState<AiEditPreviewSession | null>(null);
   const [editorEpoch, setEditorEpoch] = useState(0);
-  const [markdownViewMode, setMarkdownViewMode] = useState<MarkdownViewMode>('read');
+  const [markdownViewMode, setMarkdownViewMode] = useState<MarkdownViewMode>('edit');
   const [panel, setPanel] = useState<'editor' | 'settings'>('editor');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
@@ -787,6 +788,8 @@ export default function Home() {
           onPinPreview={(path) => openFile(path, true)}
           onClose={requestCloseTab}
         />
+
+        <UpdateNotifier onNotice={setNotice} />
 
         {aiEditPreview && panel !== 'settings' && (
           <AiEditReviewBar

@@ -1,0 +1,11 @@
+{
+  "version": "0.2.1",
+  "notes": "Fix desktop typing, add in-app auto-updates, and default edit mode for notes.",
+  "pub_date": "2026-08-17T17:14:24.717Z",
+  "platforms": {
+    "darwin-aarch64": {
+      "url": "https://leaflyte.app/updates/releases/v0.2.1/Leaflyte.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHayt2TUtvV2hzK3RlbjV0UFk4Z0hFQXZpREFuaFA0VzNlTjVTTVovOVQ0NjQxMUJwUkZoY1NSbzVXcDVVVllsZ0plOWk3Nk10cWVOT25TamhSZmwyeEFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTg2ODUxCWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negp0ZE0xSmRzZFN0VkdyQmRzblNESmh2RWVDUHZ3Rzc0cDBlODdZTFpKdHNVTnVheUp4Sk9CZ1d5UEdJblp4NC9sSlhHL1RubkRyOUthbld0YVRXdjdEZz09Cg=="
+    }
+  }
+}

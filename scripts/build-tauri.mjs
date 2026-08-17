@@ -1,5 +1,5 @@
 import { rename, access } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -34,6 +34,11 @@ function runNextBuild() {
 const moved = await exists(api);
 if (moved) await rename(api, hidden);
 try {
+  const copy = spawnSync(process.execPath, [path.join(root, 'scripts', 'copy-monaco.mjs')], {
+    cwd: root,
+    stdio: 'inherit'
+  });
+  if (copy.status !== 0) throw new Error('copy-monaco failed');
   await runNextBuild();
 } finally {
   if (moved && (await exists(hidden))) await rename(hidden, api);
