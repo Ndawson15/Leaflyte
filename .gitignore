@@ -1,0 +1,21 @@
+# Dependencies & builds
+node_modules
+.next
+out
+.api-hidden
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# OS
+.DS_Store
+
+# Tauri / Rust
+src-tauri/target/
+
+# Local dev vault (your notes — not part of the app source)
+vault/
+
+# Secrets
+.env
+.env.*
+!.env.example

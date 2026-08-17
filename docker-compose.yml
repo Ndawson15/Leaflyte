@@ -1,0 +1,11 @@
+services:
+  leaflyte:
+    build: .
+    container_name: leaflyte
+    restart: unless-stopped
+    ports:
+      - "3300:3000"
+    volumes:
+      # Point this at a real path on your Unraid array so notes persist
+      # outside the container, e.g. /mnt/user/appdata/leaflyte/vault
+      - ./vault:/app/vault
