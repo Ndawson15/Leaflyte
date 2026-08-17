@@ -76,8 +76,6 @@ export function KeymapProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (e.repeat) return;
-
       const target = e.target as HTMLElement | null;
       const inEditable =
         !!target?.closest('.monaco-editor') ||
@@ -88,6 +86,8 @@ export function KeymapProvider({ children }: { children: React.ReactNode }) {
 
       // Never intercept plain typing in an editor field — only shortcut chords.
       if (inEditable && !e.metaKey && !e.ctrlKey && !e.altKey) return;
+
+      if (e.repeat) return;
 
       for (const [id, chord] of Object.entries(bindingsRef.current) as [ActionId, Chord][]) {
         if (!matchesChord(e, chord)) continue;

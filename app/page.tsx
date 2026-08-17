@@ -239,7 +239,10 @@ export default function Home() {
     if (Number.isFinite(right) && right >= MIN_SIDEBAR_WIDTH) setRightWidth(right);
   }, []);
 
+  const liveChangeTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
   const syncExternalFiles = useCallback(async () => {
+    if (dirtyRef.current.size > 0) return;
     await loadTree();
     let files: string[] = [];
     try {
@@ -434,13 +437,24 @@ export default function Home() {
   }, [revertAiEditPreview]);
 
   const onLiveChange = useCallback((path: string, next: string) => {
-    setContents((c) => ({ ...c, [path]: next }));
+    contentsRef.current = { ...contentsRef.current, [path]: next };
     setDirty((d) => new Set(d).add(path));
     if (previewPathRef.current === path) {
       previewPathRef.current = null;
       setPreviewPath(null);
       setTabs((t) => (t.includes(path) ? t : [...t, path]));
     }
+
+    const timers = liveChangeTimers.current;
+    const pending = timers.get(path);
+    if (pending) clearTimeout(pending);
+    timers.set(
+      path,
+      setTimeout(() => {
+        setContents((c) => ({ ...c, [path]: next }));
+        timers.delete(path);
+      }, 300)
+    );
   }, []);
 
   const closeTab = useCallback((path: string) => {
@@ -645,7 +659,11 @@ export default function Home() {
       { id: 'settings', label: 'Open settings', group: 'Navigation', shortcut: formatChord(bindings.settings), run: () => setPanel('settings') },
       { id: 'new-file', label: 'New file', group: 'Files', shortcut: formatChord(bindings.newFile), run: () => setPendingCreate({ kind: 'file', parent: activePath ? parentDir(activePath) : '', nonce: Date.now() }) },
       { id: 'new-folder', label: 'New folder', group: 'Files', shortcut: formatChord(bindings.newFolder), run: () => setPendingCreate({ kind: 'folder', parent: activePath ? parentDir(activePath) : '', nonce: Date.now() }) },
-      { id: 'save', label: 'Save file', group: 'Files', shortcut: formatChord(bindings.save), run: () => activePath && contents[activePath] !== undefined && saveFile(activePath, contents[activePath]) },
+      { id: 'save', label: 'Save file', group: 'Files', shortcut: formatChord(bindings.save), run: () => {
+        if (!activePath) return;
+        const next = contentsRef.current[activePath];
+        if (next !== undefined) void saveFile(activePath, next);
+      } },
       { id: 'reveal', label: 'Reveal in Finder', group: 'Files', shortcut: formatChord(bindings.revealInFinder), run: revealActive },
       { id: 'copy', label: 'Copy file path', group: 'Files', shortcut: formatChord(bindings.copyPath), run: copyActivePath },
       { id: 'vault', label: 'Toggle vault sidebar', group: 'View', shortcut: formatChord(bindings.toggleVault), run: toggleSidebar },

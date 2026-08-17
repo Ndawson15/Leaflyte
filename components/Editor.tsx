@@ -12,7 +12,7 @@ import { supportsReadView } from '@/lib/fileKind';
 import { resolveWikiTarget } from '@/lib/wikiLinks';
 import type { MarkdownViewMode } from '@/lib/themes';
 import FilePreview from '@/components/FilePreview';
-import VaultTextEditor from '@/components/VaultTextEditor';
+import VaultTextEditor, { type VaultTextEditorHandle } from '@/components/VaultTextEditor';
 import { useShortcut } from './KeymapProvider';
 import TitleDrag from '@/components/TitleDrag';
 import * as vault from '@/lib/vaultClient';
@@ -46,8 +46,10 @@ export default function Editor({
   const useNativeTextEditor = isTauri();
   const { themeColors, hasCustomColors, monacoTheme, theme } = useTheme();
   const [value, setValue] = useState(content);
+  const [readSource, setReadSource] = useState(content);
   const [status, setStatus] = useState<'saved' | 'unsaved' | 'saving'>('saved');
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const textEditorRef = useRef<VaultTextEditorHandle>(null);
   const allFilesRef = useRef(allFiles);
   const fileContentsRef = useRef(fileContents);
   const onNavigateRef = useRef(onNavigate);
@@ -73,6 +75,8 @@ export default function Editor({
 
   useEffect(() => {
     setValue(content);
+    setReadSource(content);
+    valueRef.current = content;
     setStatus('saved');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
@@ -127,6 +131,14 @@ export default function Editor({
 
   const toggleViewMode = () => {
     if (!canRead || !onFileViewModeChange) return;
+    if (!reading && useNativeTextEditor) {
+      const next = textEditorRef.current?.getValue() ?? valueRef.current;
+      valueRef.current = next;
+      setReadSource(next);
+    } else if (!reading) {
+      valueRef.current = value;
+      setReadSource(value);
+    }
     onFileViewModeChange(reading ? 'edit' : 'read');
   };
 
@@ -160,18 +172,20 @@ export default function Editor({
         {reading ? (
           <FilePreview
             path={path}
-            source={value}
+            source={readSource}
             readFile={readVaultFile}
             onWikiNavigate={handleWikiNavigate}
           />
         ) : useNativeTextEditor ? (
           <div className="min-h-0 h-full">
             <VaultTextEditor
+              ref={textEditorRef}
               key={path}
               path={path}
-              value={value}
+              defaultValue={content}
               onChange={(next) => {
-                setValue(next);
+                valueRef.current = next;
+                setStatus('unsaved');
                 onLiveChange(path, next);
                 scheduleSave(next);
               }}

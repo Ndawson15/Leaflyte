@@ -1,31 +1,46 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
-export default function VaultTextEditor({
-  path,
-  value,
-  onChange
-}: {
-  path: string;
-  value: string;
-  onChange: (next: string) => void;
-}) {
-  const ref = useRef<HTMLTextAreaElement>(null);
+export type VaultTextEditorHandle = {
+  getValue: () => string;
+  setValue: (next: string) => void;
+  focus: () => void;
+};
+
+const VaultTextEditor = forwardRef<
+  VaultTextEditorHandle,
+  {
+    path: string;
+    defaultValue: string;
+    onChange: (next: string) => void;
+  }
+>(function VaultTextEditor({ path, defaultValue, onChange }, ref) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    getValue: () => textareaRef.current?.value ?? '',
+    setValue: (next: string) => {
+      if (textareaRef.current) textareaRef.current.value = next;
+    },
+    focus: () => textareaRef.current?.focus()
+  }));
 
   useEffect(() => {
-    ref.current?.focus();
+    textareaRef.current?.focus();
   }, [path]);
 
   return (
     <textarea
-      ref={ref}
+      ref={textareaRef}
       className="leaflyte-text-editor h-full w-full resize-none bg-bg text-text outline-none border-0 p-4 font-mono text-[13px] leading-relaxed"
       spellCheck={false}
       autoCapitalize="off"
       autoCorrect="off"
-      value={value}
+      defaultValue={defaultValue}
       onChange={(e) => onChange(e.target.value)}
     />
   );
-}
+});
+
+export default VaultTextEditor;
