@@ -3,20 +3,13 @@
 import { Eye, Pencil } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import MonacoSurface from '@/components/MonacoSurface';
-import { languageForPath } from '@/lib/languageMap';
-import { attachWikiLinkDecorations, ensureWikiLinkSupport } from '@/lib/wikiLinkMonaco';
-import { ensureMonacoThemes, registerCustomMonacoTheme } from '@/lib/monacoThemes';
-import { useTheme } from '@/components/ThemeProvider';
-import { ensureCfmlLanguage } from '@/lib/cfmlMonaco';
 import { supportsReadView } from '@/lib/fileKind';
 import { resolveWikiTarget } from '@/lib/wikiLinks';
 import type { MarkdownViewMode } from '@/lib/themes';
 import FilePreview from '@/components/FilePreview';
-import VaultTextEditor, { type VaultTextEditorHandle } from '@/components/VaultTextEditor';
 import { useShortcut } from './KeymapProvider';
 import TitleDrag from '@/components/TitleDrag';
 import * as vault from '@/lib/vaultClient';
-import { isTauri } from '@/lib/vaultClient';
 
 interface EditorProps {
   path: string;
@@ -28,7 +21,6 @@ interface EditorProps {
   onSave: (path: string, content: string) => Promise<void>;
   onLiveChange: (path: string, content: string) => void;
   onNavigate: (path: string) => void;
-  onCreateLink: (path: string) => void;
 }
 
 export default function Editor({
@@ -40,31 +32,24 @@ export default function Editor({
   onFileViewModeChange,
   onSave,
   onLiveChange,
-  onNavigate,
-  onCreateLink
+  onNavigate
 }: EditorProps) {
-  const useNativeTextEditor = isTauri();
-  const { themeColors, hasCustomColors, monacoTheme, theme } = useTheme();
   const [value, setValue] = useState(content);
   const [readSource, setReadSource] = useState(content);
   const [status, setStatus] = useState<'saved' | 'unsaved' | 'saving'>('saved');
+  const statusRef = useRef(status);
+  statusRef.current = status;
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const textEditorRef = useRef<VaultTextEditorHandle>(null);
   const allFilesRef = useRef(allFiles);
   const fileContentsRef = useRef(fileContents);
   const onNavigateRef = useRef(onNavigate);
-  const onCreateLinkRef = useRef(onCreateLink);
-  const pathRef = useRef(path);
   const valueRef = useRef(value);
-  const wikiLinksRef = useRef<{ refresh: () => void; dispose: () => void } | null>(null);
   const canRead = supportsReadView(path);
   const reading = canRead && fileViewMode === 'read';
 
   allFilesRef.current = allFiles;
   fileContentsRef.current = fileContents;
   onNavigateRef.current = onNavigate;
-  onCreateLinkRef.current = onCreateLink;
-  pathRef.current = path;
   valueRef.current = value;
 
   const readVaultFile = useCallback(async (filePath: string) => {
@@ -81,24 +66,8 @@ export default function Editor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
-  useEffect(() => {
-    wikiLinksRef.current?.refresh();
-  }, [allFiles]);
-
-  useEffect(() => {
-    if (!hasCustomColors) return;
-    void import('monaco-editor').then((monaco) => {
-      registerCustomMonacoTheme(monaco, themeColors, theme.colorScheme === 'dark');
-      monaco.editor.setTheme('leaflyte-custom');
-    });
-  }, [hasCustomColors, themeColors, theme.colorScheme]);
-
-  useEffect(() => {
-    return () => wikiLinksRef.current?.dispose();
-  }, [path]);
-
   const scheduleSave = (next: string) => {
-    setStatus('unsaved');
+    if (statusRef.current !== 'unsaved') setStatus('unsaved');
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => doSave(next), 1500);
   };
@@ -117,13 +86,6 @@ export default function Editor({
 
   useShortcut('save', saveNow);
 
-  const wikiContext = () => ({
-    files: allFilesRef.current,
-    currentPath: pathRef.current,
-    navigate: (p: string) => onNavigateRef.current(p),
-    createAndOpen: (p: string) => onCreateLinkRef.current(p)
-  });
-
   const handleWikiNavigate = (target: string) => {
     const resolved = resolveWikiTarget(target, allFilesRef.current);
     if (resolved) onNavigateRef.current(resolved);
@@ -131,11 +93,7 @@ export default function Editor({
 
   const toggleViewMode = () => {
     if (!canRead || !onFileViewModeChange) return;
-    if (!reading && useNativeTextEditor) {
-      const next = textEditorRef.current?.getValue() ?? valueRef.current;
-      valueRef.current = next;
-      setReadSource(next);
-    } else if (!reading) {
+    if (!reading) {
       valueRef.current = value;
       setReadSource(value);
     }
@@ -176,50 +134,13 @@ export default function Editor({
             readFile={readVaultFile}
             onWikiNavigate={handleWikiNavigate}
           />
-        ) : useNativeTextEditor ? (
-          <div className="min-h-0 h-full">
-            <VaultTextEditor
-              ref={textEditorRef}
-              key={path}
-              path={path}
-              defaultValue={content}
-              onChange={(next) => {
-                valueRef.current = next;
-                setStatus('unsaved');
-                onLiveChange(path, next);
-                scheduleSave(next);
-              }}
-            />
-          </div>
         ) : (
           <div className="min-h-0 h-full">
             <MonacoSurface
               key={path}
               height="100%"
-              theme={monacoTheme}
-              language={languageForPath(path)}
               value={value}
-              beforeMount={(monaco) => {
-                ensureMonacoThemes(monaco);
-                ensureCfmlLanguage(monaco);
-                ensureWikiLinkSupport(monaco, wikiContext);
-                if (hasCustomColors) {
-                  registerCustomMonacoTheme(monaco, themeColors, theme.colorScheme === 'dark');
-                }
-              }}
-              onMount={(editor, monaco) => {
-                if (hasCustomColors) {
-                  registerCustomMonacoTheme(monaco, themeColors, theme.colorScheme === 'dark');
-                  monaco.editor.setTheme('leaflyte-custom');
-                }
-                wikiLinksRef.current?.dispose();
-                wikiLinksRef.current = attachWikiLinkDecorations(monaco, editor, wikiContext);
-                editor.updateOptions({ readOnly: false, domReadOnly: false });
-                const focus = () => editor.focus();
-                focus();
-                requestAnimationFrame(focus);
-                editor.getContainerDomNode().addEventListener('mousedown', focus);
-              }}
+              onMount={(editor) => editor.focus()}
               onChange={(v) => {
                 const next = v ?? '';
                 setValue(next);
@@ -235,7 +156,8 @@ export default function Editor({
                 scrollBeyondLastLine: false,
                 automaticLayout: true,
                 links: true,
-                readOnly: false
+                readOnly: false,
+                editContext: false
               }}
             />
           </div>

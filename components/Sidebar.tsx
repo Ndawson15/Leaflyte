@@ -13,13 +13,13 @@ import {
 import type { TreeNode } from '@/lib/vault';
 import { destinationForDrop, dropTargetFromEvent, isInvalidMove, joinPath, parentDir, rewritePath, basename, type DropTarget } from '@/lib/paths';
 import { dispatchAiDropHover, dispatchAiTagFile } from '@/lib/ai/mentions';
-import { APP_NAME } from '@/lib/appInfo';
-import AppLogo from '@/components/AppLogo';
 import FileTypeIcon from '@/components/FileTypeIcon';
 import TitleDrag from '@/components/TitleDrag';
+import UpdateButton from '@/components/UpdateButton';
 import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
 
 const ICON = { size: 15, strokeWidth: 1.75, className: 'shrink-0' as const };
+const VAULT_POINTER_DRAG_ENABLED = false;
 
 type Creating = { parent: string; kind: 'file' | 'folder' };
 
@@ -182,6 +182,7 @@ export default function Sidebar({
     e: PointerEvent,
     node: { path: string; type: 'file' | 'folder'; name: string }
   ) => {
+    if (!VAULT_POINTER_DRAG_ENABLED) return;
     if (e.button !== 0) return;
     if ((e.target as HTMLElement).closest('button')) return;
     pendingDrag.current = {
@@ -198,6 +199,7 @@ export default function Sidebar({
 
   useEffect(() => {
     document.body.classList.remove('is-vault-dragging');
+    if (!VAULT_POINTER_DRAG_ENABLED) return;
 
     const activateDrag = (d: NonNullable<typeof pendingDrag.current>, e: globalThis.PointerEvent) => {
       if (d.active) return;
@@ -214,7 +216,6 @@ export default function Sidebar({
 
     const endDrag = (d: NonNullable<typeof pendingDrag.current> | null) => {
       setVaultDragging(false);
-      clearTextSelection();
       if (d) {
         try {
           if (d.target.hasPointerCapture(d.pointerId)) d.target.releasePointerCapture(d.pointerId);
@@ -248,11 +249,16 @@ export default function Sidebar({
       setGhost({ x: e.clientX, y: e.clientY, name: d.name });
       e.preventDefault();
     };
+    const cancelPendingDrag = () => {
+      if (!pendingDrag.current?.active) pendingDrag.current = null;
+    };
     const onUp = (e: globalThis.PointerEvent) => {
       const d = pendingDrag.current;
       pendingDrag.current = null;
+      if (!d) return;
+
       setGhost(null);
-      if (!d?.active) {
+      if (!d.active) {
         endDrag(d);
         dispatchAiDropHover(false);
         setDragging(null);
@@ -288,6 +294,7 @@ export default function Sidebar({
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
+    document.addEventListener('pointerdown', cancelPendingDrag, true);
     const onBlur = () => {
       pendingDrag.current = null;
       setGhost(null);
@@ -302,6 +309,7 @@ export default function Sidebar({
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
+      document.removeEventListener('pointerdown', cancelPendingDrag, true);
       window.removeEventListener('blur', onBlur);
       document.removeEventListener('visibilitychange', onBlur);
       setVaultDragging(false);
@@ -350,7 +358,10 @@ export default function Sidebar({
   if (collapsed) {
     return (
       <div className="titlebar-rail h-full w-full flex flex-col items-center py-2 bg-surface font-sans">
-        <TitleDrag className="h-8 w-full shrink-0" />
+        <div className="flex w-full items-center justify-center gap-0.5 shrink-0 h-9 px-1">
+          <UpdateButton variant="rail" onNotice={onNotice} />
+          <TitleDrag className="flex-1 h-full min-w-0" />
+        </div>
         <IconButton title="Show vault" onClick={onToggleCollapsed}>
           <PanelLeft {...ICON} />
         </IconButton>
@@ -375,10 +386,7 @@ export default function Sidebar({
     <div ref={sidebarRef} data-vault-sidebar className="h-full flex flex-col bg-surface font-sans text-[13px]">
       <div className="titlebar-left shrink-0 border-b border-border/60">
         <div className="titlebar-traffic-spacer shrink-0" aria-hidden />
-        <div className="titlebar-brand flex shrink-0 items-center gap-1.5 px-1.5">
-          <AppLogo size={18} alt="" />
-          <span className="text-[12px] font-medium text-text">{APP_NAME}</span>
-        </div>
+        <UpdateButton onNotice={onNotice} />
         <TitleDrag className="min-w-0 flex-1 self-stretch" />
       </div>
 

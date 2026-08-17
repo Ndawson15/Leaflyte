@@ -1,11 +1,11 @@
 {
-  "version": "0.2.4",
-  "notes": "Fix app-wide text selection blocked by vault drag, restore editor click-to-focus, remove testing reset from settings.",
-  "pub_date": "2026-08-17T17:35:00.000Z",
+  "version": "0.2.5",
+  "notes": "Fix Monaco typing and caret placement on macOS, add the compact titlebar update button, and simplify General settings.",
+  "pub_date": "2026-08-17T18:37:08.987Z",
   "platforms": {
     "darwin-aarch64": {
-      "url": "https://leaflyte.app/updates/releases/v0.2.4/Leaflyte.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHa3pNYXJCeWFzbEZCVFNsTjlUYXNHZE5HSUtRU2dHbzYvWlpiZG1wT0ZrQlBhMmJxNHlEdFpINkJPUEF4QVhNZ09UVm5XMXpOcjQyOG8vTy9rSWxaL3cwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTg4MDE4CWZpbGU6TGVhZmx5dGUuYXBwLnRhci5nego5eDY4NU5zL1FnNmNFUlZZUlRQbm9SS29BYjM2STc3RWhyWGQyWU5neUNUMm42aC9HTW5lM2hzem4zZnoyQURhTHdnVTlWNVhBYnpqZDFSNFhPZzVCQT09Cg=="
+      "url": "https://leaflyte.app/updates/releases/v0.2.5/Leaflyte.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHazN5VnNBY0JJcW14Ukp6bDV4Mm1BbHRqdFFZMFJJTFhhekE5VUZFWkhJSFFkWjEzT0lWZW1TWHhocmJEZFVqbHlxZFRvUE4vSjd1M0cwYnBjSmxnS2dvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTkxNzc4CWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negorUHFUcGtUaVE4Mnk2QnFvQ29aQzQvZVZkaXA4MlY4aExaOHpxbmp4YWFpMTBXTnc2SHZrYjVhckJHU3RBKzRZc3ZTVGx4UDNyL0NDVGltUEJMUGNDQT09Cg=="
     }
   }
 }

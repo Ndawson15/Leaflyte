@@ -14,7 +14,6 @@ import ResizeHandle from '@/components/ResizeHandle';
 import Settings from '@/components/Settings';
 import AiChat from '@/components/AiChat';
 import { AiEditReviewBar } from '@/components/AiEditProposal';
-import UpdateNotifier from '@/components/UpdateNotifier';
 import AppLogo from '@/components/AppLogo';
 import TitleDrag from '@/components/TitleDrag';
 import { APP_NAME } from '@/lib/appInfo';
@@ -735,7 +734,6 @@ export default function Home() {
           onSave={saveFile}
           onLiveChange={onLiveChange}
           onNavigate={openFile}
-          onCreateLink={createFile}
         />
       </div>
     );
@@ -806,8 +804,6 @@ export default function Home() {
           onPinPreview={(path) => openFile(path, true)}
           onClose={requestCloseTab}
         />
-
-        <UpdateNotifier onNotice={setNotice} />
 
         {aiEditPreview && panel !== 'settings' && (
           <AiEditReviewBar

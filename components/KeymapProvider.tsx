@@ -22,6 +22,15 @@ interface KeymapContextValue {
   register: (id: ActionId, handler: () => void) => () => void;
 }
 
+function isEditableTarget(target: EventTarget | null) {
+  if (!target || !(target instanceof Node)) return false;
+  const el = target instanceof Element ? target : target.parentElement;
+  if (!el) return false;
+  return !!el.closest(
+    '.monaco-editor, .leaflyte-text-editor, input, textarea, select, [contenteditable="true"]'
+  );
+}
+
 const KeymapContext = createContext<KeymapContextValue | null>(null);
 
 export function KeymapProvider({ children }: { children: React.ReactNode }) {
@@ -76,14 +85,8 @@ export function KeymapProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const target = e.target as HTMLElement | null;
-      const inEditable =
-        !!target?.closest('.monaco-editor') ||
-        !!target?.closest('.leaflyte-text-editor') ||
-        !!target?.closest('[contenteditable="true"]') ||
-        target?.tagName === 'INPUT' ||
-        target?.tagName === 'TEXTAREA' ||
-        target?.isContentEditable;
+      const target = e.target;
+      const inEditable = isEditableTarget(target);
 
       // Never intercept plain typing in an editor field — only shortcut chords.
       if (inEditable && !e.metaKey && !e.ctrlKey && !e.altKey) return;

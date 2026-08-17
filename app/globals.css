@@ -102,7 +102,7 @@ html.tauri-overlay .titlebar-traffic-spacer {
   width: var(--traffic-inset);
 }
 
-.titlebar-brand {
+.titlebar-update {
   position: relative;
   z-index: 1;
 }
@@ -117,6 +117,11 @@ html.tauri-overlay .titlebar-traffic-spacer {
   -webkit-app-region: no-drag;
   app-region: no-drag;
   cursor: text;
+}
+
+html.tauri-overlay .monaco-editor textarea.inputarea {
+  z-index: 1 !important;
+  pointer-events: none !important;
 }
 
 * {
@@ -285,15 +290,7 @@ html.tauri-overlay .titlebar-traffic-spacer {
   background: var(--cv-amber);
 }
 
-.resize-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  cursor: col-resize;
-}
-
 body.is-resizing,
 body.is-resizing * {
   cursor: col-resize !important;
-  user-select: none !important;
 }

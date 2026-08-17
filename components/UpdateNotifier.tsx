@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { Update } from '@tauri-apps/plugin-updater';
 import { APP_VERSION } from '@/lib/appInfo';
 import { checkForAppUpdate, installAppUpdate } from '@/lib/updater';
@@ -73,60 +73,6 @@ export function UpdateSettingsRow({ onNotice }: { onNotice?: (message: string) =
           </button>
         </div>
       )}
-    </div>
-  );
-}
-
-export default function UpdateNotifier({ onNotice }: { onNotice?: (message: string) => void }) {
-  const [update, setUpdate] = useState<Update | null>(null);
-  const [installing, setInstalling] = useState(false);
-
-  useEffect(() => {
-    if (!isTauri()) return;
-    const timer = window.setTimeout(async () => {
-      try {
-        const found = await checkForAppUpdate();
-        if (found) setUpdate(found);
-      } catch {
-        /* offline or manifest not published yet */
-      }
-    }, 5000);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  if (!update) return null;
-
-  return (
-    <div className="shrink-0 flex items-center justify-between gap-3 px-4 py-2 border-b border-border bg-surface2 text-xs">
-      <span className="text-text">
-        Update available: <span className="text-amber font-medium">v{update.version}</span>
-        {update.body ? ` — ${update.body}` : ''}
-      </span>
-      <div className="flex items-center gap-2 shrink-0">
-        <button
-          type="button"
-          onClick={() => setUpdate(null)}
-          className="px-2 py-1 rounded text-muted hover:text-text hover:bg-surface"
-        >
-          Later
-        </button>
-        <button
-          type="button"
-          disabled={installing}
-          onClick={async () => {
-            setInstalling(true);
-            try {
-              await installAppUpdate(update);
-            } catch (err) {
-              onNotice?.(err instanceof Error ? err.message : 'Update failed.');
-              setInstalling(false);
-            }
-          }}
-          className="px-2.5 py-1 rounded bg-amber text-bg font-medium hover:opacity-90 disabled:opacity-50"
-        >
-          {installing ? 'Installing…' : 'Update now'}
-        </button>
-      </div>
     </div>
   );
 }
