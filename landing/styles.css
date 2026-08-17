@@ -206,15 +206,46 @@ h1 .accent {
   text-underline-offset: 2px;
 }
 
+.product-shot {
+  position: relative;
+  z-index: 2;
+  margin: -40px 0 64px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.36),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+
+.product-shot img {
+  width: 100%;
+  border-radius: 11px;
+}
+
 .features {
   display: grid;
   gap: 16px;
-  margin: 48px 0 80px;
+  margin: 0 0 80px;
 }
 
 @media (min-width: 640px) {
   .features {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 639px) {
+  .product-shot {
+    margin-top: -24px;
+    margin-bottom: 48px;
+    padding: 3px;
+    border-radius: 12px;
+  }
+
+  .product-shot img {
+    border-radius: 8px;
   }
 }
 
