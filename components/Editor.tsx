@@ -10,6 +10,7 @@ import FilePreview from '@/components/FilePreview';
 import { useShortcut } from './KeymapProvider';
 import TitleDrag from '@/components/TitleDrag';
 import * as vault from '@/lib/vaultClient';
+import { languageForPath } from '@/lib/languageMap';
 
 interface EditorProps {
   path: string;
@@ -139,6 +140,7 @@ export default function Editor({
             <MonacoSurface
               key={path}
               height="100%"
+              language={languageForPath(path)}
               value={value}
               onMount={(editor) => editor.focus()}
               onChange={(v) => {
