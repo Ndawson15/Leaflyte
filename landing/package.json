@@ -1,0 +1,9 @@
+{
+  "name": "leaflyte-landing",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Leaflyte marketing site — static HTML for leaflyte.app",
+  "engines": {
+    "node": ">=22"
+  }
+}
