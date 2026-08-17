@@ -246,7 +246,7 @@ function AiPanel() {
     <div className="space-y-6">
       <SettingsSection
         title="Vault AI"
-        description="Bring your own API key. Stored only on this device — never sent anywhere except the provider you choose."
+        description="Bring your own API key. Stored in this browser only (localStorage) — not in git, not on our servers. Sent only to the provider you choose when you use AI chat."
       >
         <div className="border border-border rounded-lg bg-surface divide-y divide-border">
           <div className="px-4 py-3 space-y-2">

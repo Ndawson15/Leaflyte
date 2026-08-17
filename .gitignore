@@ -15,7 +15,12 @@ src-tauri/target/
 # Local dev vault (your notes — not part of the app source)
 vault/
 
-# Secrets
+# Secrets & local config (never commit real keys)
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+**/local.config.json

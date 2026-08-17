@@ -12,11 +12,17 @@ In hPanel → **Add Website** → **Node.js web app** → import [Ndawson15/Leaf
 | Branch | `main` |
 | Node version | 22.x |
 | Root directory | **`landing`** |
-| Build command | *(leave empty)* |
-| Output directory | **`.`** |
+| Build command | **`build`** |
+| Output directory | **`dist`** |
 | Entry file | *(leave empty — static site)* |
 
 Do **not** deploy the repo root with Next.js — that is the Tauri/desktop app, not the marketing site.
+
+Test the build locally:
+
+```bash
+cd landing && npm run build && npx --yes serve dist
+```
 
 See [Hostinger Node.js build settings](https://docs.hostinger.com/node.js/build-settings).
 

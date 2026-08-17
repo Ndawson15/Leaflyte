@@ -12,6 +12,8 @@ export interface AiConfig {
 
 export const AI_STORAGE_KEY = 'leaflyte.ai';
 
+/** API keys are persisted via localStorage only — never written to repo files or .env. */
+
 export const AI_PROVIDERS: { id: AiProvider; name: string; description: string }[] = [
   { id: 'off', name: 'Off', description: 'AI chat disabled' },
   { id: 'anthropic', name: 'Anthropic', description: 'Claude models' },
