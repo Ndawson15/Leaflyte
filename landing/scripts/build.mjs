@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const out = join(root, 'dist');
+const out = join(root, 'public');
 
 const staticPaths = ['index.html', 'styles.css', 'assets', 'downloads'];
 

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Leaflyte — Your notes, real files, no lock-in</title>
+    <meta
+      name="description"
+      content="Leaflyte is a free desktop notes app where every note is a plain file on disk. Local-first vault with search, wiki links, and AI."
+    />
+    <link rel="icon" href="assets/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="glow" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <header class="site-header">
+        <div class="brand">
+          <img src="assets/leaflyte.png" width="28" height="28" alt="" />
+          <span>Leaflyte</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="pill">
+            <strong>Free</strong>
+            <span>·</span>
+            <span>No account</span>
+            <span>·</span>
+            <span>Local-first</span>
+          </div>
+
+          <img class="hero-logo" src="assets/leaflyte.png" width="72" height="72" alt="Leaflyte" />
+
+          <h1>Notes that stay <span class="accent">real files</span> — not another walled garden.</h1>
+
+          <p class="lead">
+            Leaflyte is a desktop vault for people who want Obsidian-style linking and search, a proper
+            editor, and AI that reads your folder — without giving up ownership of your data.
+          </p>
+
+          <div class="cta-row">
+            <a class="btn" href="downloads/Leaflyte.dmg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+                />
+              </svg>
+              Download for Mac
+            </a>
+            <a class="btn" href="downloads/Leaflyte-setup.exe">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 15V3" />
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <path d="m7 10 5 5 5-5" />
+              </svg>
+              Download for Windows
+            </a>
+          </div>
+
+          <p class="fine-print">macOS 11+ and Windows 10+. Installers are free — no signup required.</p>
+        </section>
+
+        <section class="features" aria-label="Features">
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+              </svg>
+            </div>
+            <h2>Plain files on disk</h2>
+            <p>
+              Your vault is a normal folder — markdown, HTML, SQL, Python, whatever you use. Back it up, sync
+              it, or open it in any editor.
+            </p>
+          </article>
+
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+              </svg>
+            </div>
+            <h2>AI that knows your vault</h2>
+            <p>
+              Ask questions across your notes, tag files with @, and preview AI edits in the editor before you
+              approve them.
+            </p>
+          </article>
+
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h2>Built for focus</h2>
+            <p>
+              Tabs, quick switcher, backlinks, and read/edit modes for markdown and HTML — without turning
+              your notes into a database.
+            </p>
+          </article>
+        </section>
+
+        <section class="closing">
+          <h2>Yours from day one</h2>
+          <p>
+            Pick a folder, name a workspace, and start writing. No subscription, no sync vendor, no export
+            anxiety — just files you already understand, with a UI that respects them.
+          </p>
+          <div class="cta-row">
+            <a class="btn" href="downloads/Leaflyte.dmg">Download for Mac</a>
+            <a class="btn" href="downloads/Leaflyte-setup.exe">Download for Windows</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">© <span id="year"></span> Leaflyte. Free to use.</footer>
+    </div>
+
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
