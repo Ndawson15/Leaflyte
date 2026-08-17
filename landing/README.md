@@ -13,7 +13,7 @@ In hPanel → **Add Website** → **Node.js web app** → import [Ndawson15/Leaf
 | Node version | 22.x |
 | Root directory | **`landing`** |
 | Build command | **`build`** |
-| Output directory | **`public`** |
+| Output directory | **`build`** |
 | Entry file | *(leave empty — static site)* |
 
 Keep the root directory as **`landing`** — do not point Hostinger at the repo root (that is the Next.js desktop app).
@@ -23,7 +23,7 @@ Do **not** deploy the repo root with Next.js — that is the Tauri/desktop app, 
 Test the build locally:
 
 ```bash
-cd landing && npm run build && npx --yes serve public
+cd landing && npm run build && npx --yes serve build
 ```
 
 See [Hostinger Node.js build settings](https://docs.hostinger.com/node.js/build-settings).
