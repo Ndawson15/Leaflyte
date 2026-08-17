@@ -80,6 +80,7 @@ export function KeymapProvider({ children }: { children: React.ReactNode }) {
       const inEditable =
         !!target?.closest('.monaco-editor') ||
         !!target?.closest('.leaflyte-text-editor') ||
+        !!target?.closest('[contenteditable="true"]') ||
         target?.tagName === 'INPUT' ||
         target?.tagName === 'TEXTAREA' ||
         target?.isContentEditable;

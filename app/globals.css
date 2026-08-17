@@ -111,6 +111,14 @@ html.tauri-overlay .titlebar-traffic-spacer {
   cursor: default;
 }
 
+.leaflyte-text-editor {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+  cursor: text;
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--cv-border) transparent;
@@ -283,7 +291,9 @@ body.is-resizing * {
 }
 
 body.is-vault-dragging .monaco-editor,
-body.is-vault-dragging .monaco-editor * {
+body.is-vault-dragging .monaco-editor *,
+body.is-vault-dragging .leaflyte-text-editor,
+body.is-vault-dragging .leaflyte-text-editor * {
   -webkit-user-select: text !important;
   user-select: text !important;
 }

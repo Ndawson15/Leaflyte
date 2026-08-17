@@ -197,7 +197,7 @@ export default function Sidebar({
   useEffect(() => {
     const onSelectStart = (e: Event) => {
       const target = e.target as Node | null;
-      if (target && (target as Element).closest?.('.monaco-editor')) return;
+      if (target && (target as Element).closest?.('.monaco-editor, .leaflyte-text-editor')) return;
       if (pendingDrag.current?.active || dragPathRef.current) e.preventDefault();
     };
 

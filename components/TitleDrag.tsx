@@ -2,15 +2,24 @@
 
 import { isTauri } from '@/lib/vaultClient';
 
+const INTERACTIVE =
+  'button, a, input, select, textarea, [contenteditable="true"], .leaflyte-text-editor, [data-no-drag]';
+
 export default function TitleDrag({ className = '' }: { className?: string }) {
   return (
     <div
-      data-tauri-drag-region
+      data-no-drag
       className={className}
-      onDoubleClick={async () => {
-        if (!isTauri()) return;
-        const { getCurrentWindow } = await import('@tauri-apps/api/window');
-        await getCurrentWindow().toggleMaximize();
+      onMouseDown={(e) => {
+        if (!isTauri() || e.button !== 0) return;
+        if ((e.target as HTMLElement).closest(INTERACTIVE)) return;
+        e.preventDefault();
+        void (async () => {
+          const { getCurrentWindow } = await import('@tauri-apps/api/window');
+          const win = getCurrentWindow();
+          if (e.detail === 2) await win.toggleMaximize();
+          else await win.startDragging();
+        })();
       }}
     />
   );

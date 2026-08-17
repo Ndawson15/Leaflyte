@@ -1,11 +1,11 @@
 {
-  "version": "0.2.2",
-  "notes": "Fix desktop editor typing by avoiding full-app re-renders on every keystroke.",
-  "pub_date": "2026-08-17T17:20:08.222Z",
+  "version": "0.2.3",
+  "notes": "Fix editor click-to-focus on macOS by switching from textarea to contenteditable and programmatic window dragging.",
+  "pub_date": "2026-08-17T17:27:00.000Z",
   "platforms": {
     "darwin-aarch64": {
-      "url": "https://leaflyte.app/updates/releases/v0.2.2/Leaflyte.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHazZsbm91ZjBvK0c3bDhaZFpjb3lSQjJKN1FFWXJIOUpLSFlvSGpQMU50WVZHNzF2ZWxpSGFVcFcxR2ZqSVNpcWh4YlFCeFh5MzNyY3RueXhVTEVnZndFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTg3MTk2CWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negp1MExlbGxzaW5Ld1EzenZ5Rnc3WnQ5THRDaUtuUlVHOFpwejQvcXhrRllwcEs3NllGb3VaTHVmdjBsTDhmY0tJS2tGN2V2aXBpWWVDdS9yZzU5SmNBZz09Cg=="
+      "url": "https://leaflyte.app/updates/releases/v0.2.3/Leaflyte.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHazN2WklodFVOREJzdEE4UWIvL04zd244MmdWTU10bEVwK3FLZlY3TjlEaE5nMzZRdGRXYkxWSzZVeExhNlBkL1dUK0RkQkRjZThFVFhTVGM0c1pLa0FvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTg3NjU0CWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negoxaTBFa1p2Q2VGdHVkaldXT2RBYlUzUkwxdXZSRG4xdjFUekttYkZvcFVYdEdPajVNNEVUdGgzVW5CVkd4M2Qvb1pFY0p1Yzk4MW5EeU0rd2Z6ZlREdz09Cg=="
     }
   }
 }
