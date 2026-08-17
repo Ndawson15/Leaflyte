@@ -4,45 +4,50 @@ Static marketing site for [Leaflyte](https://github.com/Ndawson15/Leaflyte). Dep
 
 ## Hostinger (Node.js web app → GitHub)
 
-In hPanel → **Add Website** → **Node.js web app** → import [Ndawson15/Leaflyte](https://github.com/Ndawson15/Leaflyte):
+In hPanel → your site → **Deployments** / build settings:
 
-| Setting | Value |
-|---------|--------|
-| Framework preset | **Other** (not Next.js) |
-| Branch | `main` |
-| Node version | 22.x |
-| Root directory | **`landing`** |
-| Build command | **`build`** |
-| Output directory | **`build`** |
-| Entry file | *(leave empty — static site)* |
+### Required (fix “No output directory found”)
 
-Keep the root directory as **`landing`** — do not point Hostinger at the repo root (that is the Next.js desktop app).
+Hostinger’s auto-diagnosis often says “use Next.js” — **ignore that** for this site.
 
-Do **not** deploy the repo root with Next.js — that is the Tauri/desktop app, not the marketing site.
+| Setting | Value | Notes |
+|---------|--------|--------|
+| **Framework preset** | **Other** | Not Next.js — this is plain HTML, not the desktop app |
+| **Root directory** | **`landing`** | Keeps build scoped to the marketing site |
+| **Build command** | **`build`** | Runs `node scripts/build.mjs` |
+| **Output directory** | **`build`** | At **repo root** (`/build`), not `landing/build` |
+| **Entry file** | *(empty)* | Static site — no Node server |
+| **Node version** | 22.x | |
+| **Branch** | `main` | |
 
-Test the build locally:
+If Framework is left on **Next.js**, Hostinger looks for **`.next`** and deploy will fail even when the build log shows success.
+
+### After changing settings
+
+1. Save settings.
+2. **Redeploy** (new deploy, not just rebuild with old config).
+
+### Test locally
 
 ```bash
-cd landing && npm run build && npx --yes serve build
+cd landing && npm run build
+ls ../build/index.html   # output is at repo root build/
+npx --yes serve ../build
 ```
 
-See [Hostinger Node.js build settings](https://docs.hostinger.com/node.js/build-settings).
-
-## Preview locally
+## Preview without build
 
 ```bash
-python3 -m http.server 8080
+cd landing && python3 -m http.server 8080
 ```
-
-Open http://localhost:8080
 
 ## Downloads
 
-After `npm run tauri:build` (from repo root), copy installers into `downloads/`:
+After `npm run tauri:build` (from repo root), copy installers into `landing/downloads/`:
 
 | Platform | Source |
 |----------|--------|
-| macOS | `src-tauri/target/release/bundle/dmg/*.dmg` → `downloads/Leaflyte.dmg` |
-| Windows | `src-tauri/target/release/bundle/nsis/*.exe` → `downloads/Leaflyte-setup.exe` |
+| macOS | `src-tauri/target/release/bundle/dmg/*.dmg` → `landing/downloads/Leaflyte.dmg` |
+| Windows | `src-tauri/target/release/bundle/nsis/*.exe` → `landing/downloads/Leaflyte-setup.exe` |
 
-Commit and push those files (or attach via GitHub Releases and update links in `index.html`).
+Commit and push, or use GitHub Releases and update links in `index.html`.
