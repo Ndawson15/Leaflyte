@@ -178,33 +178,33 @@ export function MarkdownToolbar({ editor }: { editor: editor.IStandaloneCodeEdit
     <div className="shrink-0 relative z-30 border-b border-border bg-surface/95 backdrop-blur-sm">
       <div className="overflow-x-auto px-3 py-1.5">
         <div className="flex items-center gap-0.5 min-w-max">
-        <HeadingMenu editor={editor} />
-        <ToolbarDivider />
-        <InlineToolbar editor={editor} />
-        <ToolbarDivider />
-        <ToolbarButton title="Bullet list" onClick={() => run(() => toggleBulletList(editor))}>
-          <List size={15} strokeWidth={1.75} />
-        </ToolbarButton>
-        <ToolbarButton title="Numbered list" onClick={() => run(() => toggleNumberedList(editor))}>
-          <ListOrdered size={15} strokeWidth={1.75} />
-        </ToolbarButton>
-        <ToolbarButton title="Task list" onClick={() => run(() => toggleTaskList(editor))}>
-          <SquareCheck size={15} strokeWidth={1.75} />
-        </ToolbarButton>
-        <ToolbarButton title="Quote" onClick={() => run(() => toggleBlockquote(editor))}>
-          <Quote size={15} strokeWidth={1.75} />
-        </ToolbarButton>
-        <ToolbarDivider />
-        <ToolbarButton title="Code block" onClick={() => run(() => insertCodeBlock(editor))}>
-          <Braces size={15} strokeWidth={1.75} />
-        </ToolbarButton>
+          <HeadingMenu editor={editor} />
+          <ToolbarDivider />
+          <InlineToolbar editor={editor} />
+          <ToolbarDivider />
+          <ToolbarButton title="Bullet list" onClick={() => run(() => toggleBulletList(editor))}>
+            <List size={15} strokeWidth={1.75} />
+          </ToolbarButton>
+          <ToolbarButton title="Numbered list" onClick={() => run(() => toggleNumberedList(editor))}>
+            <ListOrdered size={15} strokeWidth={1.75} />
+          </ToolbarButton>
+          <ToolbarButton title="Task list" onClick={() => run(() => toggleTaskList(editor))}>
+            <SquareCheck size={15} strokeWidth={1.75} />
+          </ToolbarButton>
+          <ToolbarButton title="Quote" onClick={() => run(() => toggleBlockquote(editor))}>
+            <Quote size={15} strokeWidth={1.75} />
+          </ToolbarButton>
+          <ToolbarDivider />
+          <ToolbarButton title="Code block" onClick={() => run(() => insertCodeBlock(editor))}>
+            <Braces size={15} strokeWidth={1.75} />
+          </ToolbarButton>
         <ToolbarButton title="Wiki link" onClick={() => run(() => insertWikiLink(editor))}>
-          <span className="text-[11px] font-medium tracking-tight">[[ ]]</span>
+          <span className="text-[11px] font-medium tracking-tight">{'[[ ]]'}</span>
         </ToolbarButton>
         <ToolbarButton title="Divider" onClick={() => run(() => insertHorizontalRule(editor))}>
           <Minus size={15} strokeWidth={1.75} />
         </ToolbarButton>
-      </div>
+        </div>
       </div>
     </div>
   );
