@@ -4,6 +4,7 @@ use std::path::{Component, Path, PathBuf};
 use std::sync::Mutex;
 
 const IGNORE: &[&str] = &[".git", "node_modules", ".DS_Store", ".leaflyte-index"];
+const APP_CONFIG_DIR: &str = "com.leaflyte.desktop";
 
 #[derive(Serialize, Clone)]
 pub struct TreeNode {
@@ -27,17 +28,71 @@ pub struct VaultState {
 impl VaultState {
     pub fn new() -> Self {
         Self {
-            root: Mutex::new(default_root()),
+            root: Mutex::new(initial_root()),
         }
     }
 }
 
-fn default_root() -> PathBuf {
-    if cfg!(debug_assertions) {
-        let p = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../vault");
-        let _ = fs::create_dir_all(&p);
-        return fs::canonicalize(&p).unwrap_or(p);
+fn config_dir() -> Option<PathBuf> {
+    dirs::data_dir().map(|dir| dir.join(APP_CONFIG_DIR))
+}
+
+fn persisted_vault_config_path() -> Option<PathBuf> {
+    config_dir().map(|dir| dir.join("vault-path.txt"))
+}
+
+fn load_persisted_vault_path() -> Option<PathBuf> {
+    let file = persisted_vault_config_path()?;
+    let raw = fs::read_to_string(file).ok()?;
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return None;
     }
+    let path = PathBuf::from(trimmed);
+    if path.is_dir() { Some(path) } else { None }
+}
+
+fn save_persisted_vault_path(path: &Path) -> Result<(), String> {
+    let dir = config_dir().ok_or("Could not resolve app config directory")?;
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    fs::write(
+        dir.join("vault-path.txt"),
+        path.to_string_lossy().as_bytes(),
+    )
+    .map_err(|e| e.to_string())
+}
+
+#[cfg(unix)]
+fn same_path(a: &Path, b: &Path) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    match (fs::metadata(a), fs::metadata(b)) {
+        (Ok(left), Ok(right)) => left.dev() == right.dev() && left.ino() == right.ino(),
+        _ => false,
+    }
+}
+
+#[cfg(not(unix))]
+fn same_path(a: &Path, b: &Path) -> bool {
+    a == b
+}
+
+fn initial_root() -> PathBuf {
+    if cfg!(debug_assertions) {
+        return default_dev_root();
+    }
+    if let Some(persisted) = load_persisted_vault_path() {
+        return persisted;
+    }
+    default_documents_root()
+}
+
+fn default_dev_root() -> PathBuf {
+    let p = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../vault");
+    let _ = fs::create_dir_all(&p);
+    fs::canonicalize(&p).unwrap_or(p)
+}
+
+fn default_documents_root() -> PathBuf {
     let base = dirs::document_dir()
         .or_else(dirs::home_dir)
         .unwrap_or_else(|| PathBuf::from("."));
@@ -201,12 +256,23 @@ pub fn get_vault_path(state: tauri::State<VaultState>) -> Result<String, String>
 
 #[tauri::command]
 pub fn set_vault_path(state: tauri::State<VaultState>, path: String) -> Result<String, String> {
-    let p = PathBuf::from(path.trim());
-    if !p.is_dir() {
+    let requested = PathBuf::from(path.trim());
+    if !requested.is_dir() {
         return Err("That folder does not exist".into());
     }
-    let canonical = fs::canonicalize(&p).map_err(|e| e.to_string())?;
+
+    let current = root_of(&state)?;
+    if same_path(&requested, &current) {
+        return Ok(current.to_string_lossy().to_string());
+    }
+
+    let canonical = fs::canonicalize(&requested).map_err(|e| e.to_string())?;
+    if canonical == current {
+        return Ok(current.to_string_lossy().to_string());
+    }
+
     set_root(&state, canonical.clone())?;
+    save_persisted_vault_path(&canonical)?;
     Ok(canonical.to_string_lossy().to_string())
 }
 

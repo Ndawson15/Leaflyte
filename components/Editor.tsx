@@ -49,8 +49,8 @@ export default function Editor({
   const onNavigateRef = useRef(onNavigate);
   const valueRef = useRef(value);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [monacoEditor, setMonacoEditor] = useState<editor.IStandaloneCodeEditor | null>(null);
   const editorShellRef = useRef<HTMLDivElement | null>(null);
-  const [, setEditorReady] = useState(0);
   const { markdownToolbar } = useEditorSettings();
   const canRead = supportsReadView(path);
   const isMarkdown = isMarkdownLikePath(path);
@@ -74,7 +74,7 @@ export default function Editor({
     valueRef.current = content;
     setStatus('saved');
     editorRef.current = null;
-    setEditorReady((n) => n + 1);
+    setMonacoEditor(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
@@ -146,7 +146,7 @@ export default function Editor({
           </span>
         )}
       </div>
-      {showMarkdownToolbar && <MarkdownToolbar editor={editorRef.current} />}
+      {showMarkdownToolbar && <MarkdownToolbar editor={monacoEditor} />}
       <div className="flex-1 min-h-0 overflow-hidden">
         {reading ? (
           <FilePreview
@@ -161,7 +161,7 @@ export default function Editor({
         ) : (
           <div ref={editorShellRef} className="relative min-h-0 h-full">
             {showMarkdownToolbar && (
-              <MarkdownBubbleMenu editor={editorRef.current} containerRef={editorShellRef} />
+              <MarkdownBubbleMenu editor={monacoEditor} containerRef={editorShellRef} />
             )}
             <MonacoSurface
               key={path}
@@ -170,7 +170,7 @@ export default function Editor({
               value={value}
               onMount={(editor) => {
                 editorRef.current = editor;
-                setEditorReady((n) => n + 1);
+                setMonacoEditor(editor);
                 editor.focus();
               }}
               onChange={(v) => {

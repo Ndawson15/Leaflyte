@@ -29,8 +29,8 @@ import { readLocal, writeLocal } from '@/lib/storage';
 import { formatChord } from '@/lib/shortcuts';
 import WorkspaceSetup from '@/components/WorkspaceSetup';
 import { useWorkspaces } from '@/components/WorkspaceProvider';
-import type { WorkspaceSession } from '@/lib/workspaces';
-import { EMPTY_SESSION } from '@/lib/workspaces';
+import { EMPTY_SESSION, type WorkspaceSession } from '@/lib/workspaces';
+import { vaultPathsMatch } from '@/lib/vaultPaths';
 import {
   DEFAULT_LEFT_WIDTH,
   DEFAULT_RIGHT_WIDTH,
@@ -60,7 +60,8 @@ function flatten(nodes: TreeNode[]): string[] {
 export default function Home() {
   const { theme } = useTheme();
   const { bindings } = useKeymap();
-  const { workspace, ready, needsSetup, completeSetup, store, saveSession, setActiveWorkspace } = useWorkspaces();
+  const { workspace, ready, needsSetup, completeSetup, store, saveSession, setActiveWorkspace, updateWorkspace } =
+    useWorkspaces();
   const [tree, setTree] = useState<TreeNode[]>([]);
   const [tabs, setTabs] = useState<string[]>([]);
   const [previewPath, setPreviewPath] = useState<string | null>(null);
@@ -144,7 +145,13 @@ export default function Home() {
 
       if (vault.isTauri()) {
         try {
-          await vault.setVaultPath(target.vaultPath);
+          const current = await vault.getVaultPath();
+          if (!vaultPathsMatch(current, target.vaultPath)) {
+            const resolved = await vault.setVaultPath(target.vaultPath);
+            if (!vaultPathsMatch(resolved, target.vaultPath)) {
+              updateWorkspace(target.id, { vaultPath: resolved });
+            }
+          }
         } catch (err) {
           setNotice(err instanceof Error ? err.message : 'Could not open that vault folder');
           return;
@@ -160,7 +167,7 @@ export default function Home() {
         await openFileRef.current(target.session.activePath, target.session.tabs.includes(target.session.activePath));
       }
     },
-    [store.workspaces, workspace?.id, saveSession, captureSession, setActiveWorkspace, restoreSession, loadTree]
+    [store.workspaces, workspace?.id, saveSession, captureSession, setActiveWorkspace, restoreSession, loadTree, updateWorkspace]
   );
 
   const requestSwitchWorkspace = useCallback(
@@ -188,11 +195,14 @@ export default function Home() {
       if (vault.isTauri()) {
         try {
           const current = await vault.getVaultPath();
-          if (current !== workspace.vaultPath) {
-            await vault.setVaultPath(workspace.vaultPath);
+          if (!vaultPathsMatch(current, workspace.vaultPath)) {
+            const resolved = await vault.setVaultPath(workspace.vaultPath);
+            if (!vaultPathsMatch(resolved, workspace.vaultPath)) {
+              updateWorkspace(workspace.id, { vaultPath: resolved });
+            }
           }
         } catch {
-          /* use default vault */
+          /* use persisted or default vault */
         }
       }
       restoreSession(workspace.session);
@@ -204,7 +214,7 @@ export default function Home() {
         );
       }
     })();
-  }, [ready, workspace, restoreSession, loadTree]);
+  }, [ready, workspace, restoreSession, loadTree, updateWorkspace]);
 
   useEffect(() => {
     if (!workspace?.id || !ready) return;

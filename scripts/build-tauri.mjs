@@ -1,4 +1,4 @@
-import { rename, access } from 'node:fs/promises';
+import { access, cp, rename, rm } from 'node:fs/promises';
 import { spawn, spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,12 +34,20 @@ function runNextBuild() {
 const moved = await exists(api);
 if (moved) await rename(api, hidden);
 try {
+  await rm(path.join(root, 'out'), { recursive: true, force: true });
+  await rm(path.join(root, '.next-tauri'), { recursive: true, force: true });
+  await rm(path.join(root, '.next', 'dev'), { recursive: true, force: true });
   const copy = spawnSync(process.execPath, [path.join(root, 'scripts', 'copy-monaco.mjs')], {
     cwd: root,
     stdio: 'inherit'
   });
   if (copy.status !== 0) throw new Error('copy-monaco failed');
   await runNextBuild();
+  const exportDir = path.join(root, '.next-tauri');
+  const outDir = path.join(root, 'out');
+  if (await exists(path.join(exportDir, 'index.html'))) {
+    await cp(exportDir, outDir, { recursive: true });
+  }
 } finally {
   if (moved && (await exists(hidden))) await rename(hidden, api);
 }

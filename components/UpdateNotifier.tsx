@@ -2,11 +2,12 @@
 
 import { useCallback, useState } from 'react';
 import type { Update } from '@tauri-apps/plugin-updater';
-import { APP_VERSION } from '@/lib/appInfo';
+import { useAppVersion } from '@/hooks/useAppVersion';
 import { checkForAppUpdate, installAppUpdate } from '@/lib/updater';
 import { isTauri } from '@/lib/vaultClient';
 
 export function UpdateSettingsRow({ onNotice }: { onNotice?: (message: string) => void }) {
+  const appVersion = useAppVersion();
   const [checking, setChecking] = useState(false);
   const [update, setUpdate] = useState<Update | null>(null);
   const [installing, setInstalling] = useState(false);
@@ -20,13 +21,13 @@ export function UpdateSettingsRow({ onNotice }: { onNotice?: (message: string) =
     try {
       const found = await checkForAppUpdate();
       setUpdate(found);
-      if (!found) onNotice?.(`You're on the latest version (v${APP_VERSION}).`);
+      if (!found) onNotice?.(`You're on the latest version (v${appVersion}).`);
     } catch (err) {
       onNotice?.(err instanceof Error ? err.message : 'Could not check for updates.');
     } finally {
       setChecking(false);
     }
-  }, [onNotice]);
+  }, [onNotice, appVersion]);
 
   const runInstall = async () => {
     if (!update) return;

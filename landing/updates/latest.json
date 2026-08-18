@@ -1,11 +1,11 @@
 {
-  "version": "0.2.8",
-  "notes": "Add a Notion-style markdown formatting toolbar, fix overlay menus for updates and headings, refresh the app icon with a liquid-glass look, and improve landing page screenshots.",
-  "pub_date": "2026-08-18T19:36:36.243Z",
+  "version": "0.2.9",
+  "notes": "Fix version display and markdown toolbar in production builds, repair Tauri build pipeline, and reduce duplicate Desktop folder permission prompts after updates.",
+  "pub_date": "2026-08-18T19:48:09.453Z",
   "platforms": {
     "darwin-aarch64": {
-      "url": "https://leaflyte.app/updates/releases/v0.2.8/Leaflyte.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHayt2WC95dWxoUy9pT1BzRGpIMDlSQUxrYWFseEdZZXlCUFBrcnhtQ3FJYWFudTJQTWM1UjBKSU9kcnUrSVpkcW5YZW9lTkd6dXZ2eXErRUNERXdoblFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MDgxNzgzCWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negpGN0tDdUcrbDZhSnlodjFqdTdaT1lhMkt2RGdSQmw5Wjl3aWxrNUZWamhaTit6emhJTmt2MytWOTJseWNyOUhUVmo1SGJ6ajJ5ekE1a2FhWEVUVklEZz09Cg=="
+      "url": "https://leaflyte.app/updates/releases/v0.2.9/Leaflyte.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHa3cwUnNKT1FaYmtzOVNTQVdUdkRuYld5d2dvYlVIKzJLMVdkSFdaVjVxN21vWjN5M2ZnQWl0alNWRHc0L0FFajNTMHRZQWdTV1FJVFhTa3VPSk1YSFFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MDgyNDQxCWZpbGU6TGVhZmx5dGUuYXBwLnRhci5nego0b0svcEFBYkljQ3lpd2Z0V0JnZTJZUmlmdUgwY3luNXF1V09sd1JueXQ0UjFTbjZabjF3akozNzVLdEh2R05GR2ZCbHgrQXI1ZlRlY3J2YnFjSU5CZz09Cg=="
     }
   }
 }

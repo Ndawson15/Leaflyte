@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { APP_NAME, APP_VERSION } from '@/lib/appInfo';
+import { APP_NAME } from '@/lib/appInfo';
+import { useAppVersion } from '@/hooks/useAppVersion';
 import AppLogo from '@/components/AppLogo';
 import { THEMES } from '@/lib/themes';
 import { SHORTCUT_ACTIONS, conflictFor, formatChord, type ActionId } from '@/lib/shortcuts';
@@ -117,6 +118,7 @@ function GeneralPanel({
   onNotice?: (message: string) => void;
 }) {
   const { markdownToolbar, setMarkdownToolbar } = useEditorSettings();
+  const appVersion = useAppVersion();
 
   return (
     <div className="space-y-8">
@@ -127,7 +129,7 @@ function GeneralPanel({
               <AppLogo size={28} alt="" />
               <div className="min-w-0">
                 <div className="text-sm text-text font-medium">{APP_NAME}</div>
-                <div className="text-[11px] text-muted">v{APP_VERSION}</div>
+                <div className="text-[11px] text-muted">v{appVersion}</div>
               </div>
             </div>
           </div>

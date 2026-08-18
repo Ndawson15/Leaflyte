@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowDownCircle } from 'lucide-react';
 import type { Update } from '@tauri-apps/plugin-updater';
 import FloatingPopover from '@/components/FloatingPopover';
-import { APP_VERSION } from '@/lib/appInfo';
+import { useAppVersion } from '@/hooks/useAppVersion';
 import { checkForAppUpdate, installAppUpdate } from '@/lib/updater';
 import { isTauri } from '@/lib/vaultClient';
 
@@ -19,6 +19,7 @@ export default function UpdateButton({
   const [open, setOpen] = useState(false);
   const [installing, setInstalling] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const appVersion = useAppVersion();
 
   useEffect(() => {
     if (!isTauri()) return;
@@ -77,7 +78,7 @@ export default function UpdateButton({
           <div className="text-[10px] uppercase tracking-wider text-muted">Update available</div>
           <div className="text-sm text-text font-medium mt-0.5">
             v{update.version}
-            <span className="text-muted font-normal"> · you're on v{APP_VERSION}</span>
+            <span className="text-muted font-normal"> · you're on v{appVersion}</span>
           </div>
         </div>
         <p className="px-3 py-2.5 text-xs text-muted leading-relaxed">{notes}</p>
