@@ -1,8 +1,8 @@
+use crate::vault::VaultState;
 use notify::{Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter, Manager};
-use crate::vault::VaultState;
 
 pub fn start(app: AppHandle) {
     std::thread::spawn(move || {

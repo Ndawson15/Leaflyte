@@ -204,6 +204,45 @@ html.tauri-overlay .monaco-editor textarea.inputarea {
   text-underline-offset: 2px;
 }
 
+.markdown-preview blockquote {
+  margin: 0.75rem 0;
+  padding: 0.25rem 0 0.25rem 0.9rem;
+  border-left: 3px solid color-mix(in srgb, var(--cv-amber) 55%, var(--cv-border));
+  color: var(--cv-muted);
+}
+
+.markdown-preview blockquote p {
+  margin: 0.25rem 0;
+}
+
+.markdown-preview hr {
+  margin: 1rem 0;
+  border: none;
+  border-top: 1px solid var(--cv-border);
+}
+
+.markdown-preview del {
+  opacity: 0.72;
+}
+
+.markdown-preview .task-list {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.markdown-preview .task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.markdown-preview .task-item input {
+  margin-top: 0.2rem;
+  accent-color: var(--cv-amber);
+}
+
 .tree-children {
   position: relative;
 }

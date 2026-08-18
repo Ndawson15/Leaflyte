@@ -174,7 +174,8 @@ async fn anthropic_models(api_key: &str) -> Result<Vec<AiModelOption>, String> {
     let mut after_id: Option<String> = None;
 
     loop {
-        let mut url = reqwest::Url::parse("https://api.anthropic.com/v1/models").map_err(|e| e.to_string())?;
+        let mut url = reqwest::Url::parse("https://api.anthropic.com/v1/models")
+            .map_err(|e| e.to_string())?;
         url.query_pairs_mut().append_pair("limit", "100");
         if let Some(ref id) = after_id {
             url.query_pairs_mut().append_pair("after_id", id);
@@ -255,7 +256,10 @@ async fn openai_models(api_key: &str) -> Result<Vec<AiModelOption>, String> {
 }
 
 #[tauri::command]
-pub async fn list_ai_models(provider: String, api_key: String) -> Result<Vec<AiModelOption>, String> {
+pub async fn list_ai_models(
+    provider: String,
+    api_key: String,
+) -> Result<Vec<AiModelOption>, String> {
     if api_key.trim().is_empty() {
         return Err("API key is required".into());
     }

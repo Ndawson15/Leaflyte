@@ -15,6 +15,7 @@ import AiModelSelect from '@/components/AiModelSelect';
 import WorkspacePanel from '@/components/WorkspacePanel';
 import { useWorkspaces } from '@/components/WorkspaceProvider';
 import { UpdateSettingsRow } from '@/components/UpdateNotifier';
+import { useEditorSettings } from '@/components/EditorSettingsProvider';
 
 const SETTINGS_TAB_KEY = 'leaflyte.settingsTab';
 
@@ -115,6 +116,8 @@ function GeneralPanel({
   vaultPath: string | null;
   onNotice?: (message: string) => void;
 }) {
+  const { markdownToolbar, setMarkdownToolbar } = useEditorSettings();
+
   return (
     <div className="space-y-8">
       <SettingsSection title="About" description="Leaflyte on this device.">
@@ -129,6 +132,28 @@ function GeneralPanel({
             </div>
           </div>
           <UpdateSettingsRow onNotice={onNotice} />
+        </div>
+      </SettingsSection>
+
+      <SettingsSection
+        title="Editor"
+        description="Formatting tools while you write markdown notes."
+      >
+        <div className="border border-border rounded-lg bg-surface">
+          <div className="flex items-center gap-4 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm text-text">Formatting toolbar</div>
+              <p className="text-[11px] text-muted mt-0.5">
+                Notion-style toolbar for headings, lists, links, and more. A bubble menu also
+                appears when you highlight text.
+              </p>
+            </div>
+            <Toggle
+              checked={markdownToolbar}
+              onChange={setMarkdownToolbar}
+              label="Formatting toolbar"
+            />
+          </div>
         </div>
       </SettingsSection>
 

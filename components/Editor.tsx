@@ -2,8 +2,11 @@
 
 import { Eye, Pencil } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { editor } from 'monaco-editor';
 import MonacoSurface from '@/components/MonacoSurface';
-import { supportsReadView } from '@/lib/fileKind';
+import { MarkdownBubbleMenu, MarkdownToolbar } from '@/components/MarkdownToolbar';
+import { useEditorSettings } from '@/components/EditorSettingsProvider';
+import { isMarkdownLikePath, supportsReadView } from '@/lib/fileKind';
 import { resolveWikiTarget } from '@/lib/wikiLinks';
 import type { MarkdownViewMode } from '@/lib/themes';
 import FilePreview from '@/components/FilePreview';
@@ -45,8 +48,14 @@ export default function Editor({
   const fileContentsRef = useRef(fileContents);
   const onNavigateRef = useRef(onNavigate);
   const valueRef = useRef(value);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const editorShellRef = useRef<HTMLDivElement | null>(null);
+  const [, setEditorReady] = useState(0);
+  const { markdownToolbar } = useEditorSettings();
   const canRead = supportsReadView(path);
+  const isMarkdown = isMarkdownLikePath(path);
   const reading = canRead && fileViewMode === 'read';
+  const showMarkdownToolbar = markdownToolbar && isMarkdown && !reading;
 
   allFilesRef.current = allFiles;
   fileContentsRef.current = fileContents;
@@ -64,6 +73,8 @@ export default function Editor({
     setReadSource(content);
     valueRef.current = content;
     setStatus('saved');
+    editorRef.current = null;
+    setEditorReady((n) => n + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
@@ -135,6 +146,7 @@ export default function Editor({
           </span>
         )}
       </div>
+      {showMarkdownToolbar && <MarkdownToolbar editor={editorRef.current} />}
       <div className="flex-1 min-h-0 overflow-hidden">
         {reading ? (
           <FilePreview
@@ -147,13 +159,20 @@ export default function Editor({
             onWikiNavigate={handleWikiNavigate}
           />
         ) : (
-          <div className="min-h-0 h-full">
+          <div ref={editorShellRef} className="relative min-h-0 h-full">
+            {showMarkdownToolbar && (
+              <MarkdownBubbleMenu editor={editorRef.current} containerRef={editorShellRef} />
+            )}
             <MonacoSurface
               key={path}
               height="100%"
               language={languageForPath(path)}
               value={value}
-              onMount={(editor) => editor.focus()}
+              onMount={(editor) => {
+                editorRef.current = editor;
+                setEditorReady((n) => n + 1);
+                editor.focus();
+              }}
               onChange={(v) => {
                 const next = v ?? '';
                 setValue(next);

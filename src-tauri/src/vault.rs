@@ -167,7 +167,12 @@ fn list_tree_at(root: &Path, dir: &Path, gitignore: &[String]) -> Result<Vec<Tre
     Ok(nodes)
 }
 
-fn list_files_at(root: &Path, dir: &Path, gitignore: &[String], out: &mut Vec<String>) -> Result<(), String> {
+fn list_files_at(
+    root: &Path,
+    dir: &Path,
+    gitignore: &[String],
+    out: &mut Vec<String>,
+) -> Result<(), String> {
     for entry in fs::read_dir(dir).map_err(|e| e.to_string())? {
         let entry = entry.map_err(|e| e.to_string())?;
         let name = entry.file_name().to_string_lossy().to_string();

@@ -17,6 +17,7 @@ function inlineFormat(s: string): string {
   out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
   out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  out = out.replace(/~~([^~]+)~~/g, '<del>$1</del>');
   out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
   return out;
 }
@@ -72,6 +73,27 @@ export function markdownToHtml(source: string): string {
       continue;
     }
 
+    const task = line.match(/^[-*]\s+\[([ xX])\]\s+(.+)$/);
+    if (task) {
+      if (listType !== 'ul') {
+        closeList();
+        html.push('<ul class="task-list">');
+        listType = 'ul';
+      }
+      const checked = task[1].toLowerCase() === 'x' ? ' checked' : '';
+      html.push(
+        `<li class="task-item"><input type="checkbox" disabled${checked} /> ${inlineFormat(task[2])}</li>`
+      );
+      continue;
+    }
+
+    const quote = line.match(/^>\s?(.+)$/);
+    if (quote) {
+      closeList();
+      html.push(`<blockquote><p>${inlineFormat(quote[1])}</p></blockquote>`);
+      continue;
+    }
+
     const ol = line.match(/^\d+\.\s+(.+)$/);
     if (ol) {
       if (listType !== 'ol') {
@@ -85,6 +107,12 @@ export function markdownToHtml(source: string): string {
 
     if (!line.trim()) {
       closeList();
+      continue;
+    }
+
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+      closeList();
+      html.push('<hr />');
       continue;
     }
 
