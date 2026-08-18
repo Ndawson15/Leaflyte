@@ -1,4 +1,4 @@
-import { rename, access, rm } from 'node:fs/promises';
+import { rename, access } from 'node:fs/promises';
 import { spawn, spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +22,7 @@ function runNextBuild() {
     const child = spawn(process.execPath, [nextBin, 'build'], {
       cwd: root,
       stdio: 'inherit',
-      env: { ...process.env, TAURI: '1' }
+      env: { ...process.env, TAURI: '1', NEXT_DIST_DIR: '.next-tauri' }
     });
     child.on('exit', (code) => {
       if (code === 0) resolve();
@@ -34,7 +34,6 @@ function runNextBuild() {
 const moved = await exists(api);
 if (moved) await rename(api, hidden);
 try {
-  await rm(path.join(root, '.next', 'dev'), { recursive: true, force: true });
   const copy = spawnSync(process.execPath, [path.join(root, 'scripts', 'copy-monaco.mjs')], {
     cwd: root,
     stdio: 'inherit'

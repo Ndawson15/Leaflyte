@@ -1,4 +1,5 @@
-export const WIKI_LINK_RE = /\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
+/** Wiki links only; `![[...]]` is reserved for real-file embeds. */
+export const WIKI_LINK_RE = /(?<!!)\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
 
 export interface WikiLinkMatch {
   raw: string;

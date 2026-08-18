@@ -3,7 +3,8 @@ import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(fileURLToPath(import.meta.url), '..', '..');
-const bundleRoot = join(root, 'src-tauri', 'target', 'release', 'bundle');
+const cargoTarget = process.env.CARGO_TARGET_DIR ?? join(root, 'src-tauri', 'target');
+const bundleRoot = join(cargoTarget, 'release', 'bundle');
 
 function arg(name) {
   const i = process.argv.indexOf(name);

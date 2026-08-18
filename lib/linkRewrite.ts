@@ -1,4 +1,5 @@
 import { basename } from '@/lib/paths';
+import { rewriteFileEmbedsForMove } from '@/lib/fileEmbeds';
 import { resolveWikiTarget, WIKI_LINK_RE } from '@/lib/wikiLinks';
 
 function stripExt(name: string): string {
@@ -59,7 +60,8 @@ export async function rewriteLinksAfterMove(
     } catch {
       continue;
     }
-    const next = rewriteContentLinksForMove(content, filesBefore, remap);
+    const wikiRewritten = rewriteContentLinksForMove(content, filesBefore, remap);
+    const next = rewriteFileEmbedsForMove(wikiRewritten, file, filesBefore, remap);
     if (next !== content) {
       await writeFile(file, next);
       updated += 1;

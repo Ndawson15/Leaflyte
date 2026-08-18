@@ -1,6 +1,7 @@
 # Dependencies & builds
 node_modules
 .next
+.next-tauri
 out
 public/monaco
 .api-hidden

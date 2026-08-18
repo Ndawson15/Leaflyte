@@ -1,11 +1,11 @@
 {
-  "version": "0.2.6",
-  "notes": "Restore vault drag-and-drop for organizing notes and folders, add syntax highlighting by file type, and use @ mentions for AI context.",
-  "pub_date": "2026-08-17T19:02:33.065Z",
+  "version": "0.2.7",
+  "notes": "Add resizable real-file embeds in Markdown notes, preserve embedded paths when vault items move, restore titlebar dragging, and isolate production builds from the development server.",
+  "pub_date": "2026-08-18T18:20:26.738Z",
   "platforms": {
     "darwin-aarch64": {
-      "url": "https://leaflyte.app/updates/releases/v0.2.6/Leaflyte.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHa3cvNGdDQVA3eTc1bkVLbGs0N2IxMkhZbUNyM2xYalFvOE42TnJiUEpzcGQxOHFnRzlZVERTZ1ZuZHdHa1RZakpNZ0MzeTNxVzA1TmlBQURIV2hZMEFnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg2OTkzMzM1CWZpbGU6TGVhZmx5dGUuYXBwLnRhci5negpEYUVRUHFJSTBta3hUVHk0UmNhSk5jNEJpbjVvb0swZEZYc1BhZTRPU0xGazQrZHJ3bWNmL2dsd0RyUnpQcndmTHpCeXZpYlVxci9EcHlzNHBCM1ZCdz09Cg=="
+      "url": "https://leaflyte.app/updates/releases/v0.2.7/Leaflyte.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRT0p4RmRabklHa3drWGdOazF5Nk9ZVjYwK2loZFhLUnA3UVA0bzZkTThkSXZFUDN4MnE0SERmUjRIQU4veVNTWGk3MHFKOXpQdkh0cC9lZmpUS0lYcVlaL040YUtpbHdzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MDc3MTMxCWZpbGU6TGVhZmx5dGUuYXBwLnRhci5nego0alo0WXh2Mm5ERTNFdFJKVVlYaWZ2NHBLNk1lc0FLaHhPVk5XQ3h2WW5tM2w4UTlkNGhENUozNUlsNzgvZ2Q1M3AvdDBFOFRjeG1mZGxRMW9veHdDdz09Cg=="
     }
   }
 }

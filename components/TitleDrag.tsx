@@ -8,7 +8,6 @@ const INTERACTIVE =
 export default function TitleDrag({ className = '' }: { className?: string }) {
   return (
     <div
-      data-no-drag
       className={className}
       onMouseDown={(e) => {
         if (!isTauri() || e.button !== 0) return;

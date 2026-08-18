@@ -79,6 +79,14 @@ export default function Editor({
     setStatus('saved');
   };
 
+  const updateReadSource = (next: string) => {
+    valueRef.current = next;
+    setValue(next);
+    setReadSource(next);
+    onLiveChange(path, next);
+    scheduleSave(next);
+  };
+
   const saveNow = useCallback(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     doSave(valueRef.current);
@@ -132,7 +140,10 @@ export default function Editor({
           <FilePreview
             path={path}
             source={readSource}
+            files={allFiles}
             readFile={readVaultFile}
+            onOpenFile={(filePath) => onNavigateRef.current(filePath)}
+            onSourceChange={updateReadSource}
             onWikiNavigate={handleWikiNavigate}
           />
         ) : (
