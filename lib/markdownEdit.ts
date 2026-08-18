@@ -1,4 +1,6 @@
 import type { editor } from 'monaco-editor';
+import { formatFileEmbed } from '@/lib/fileEmbeds';
+import { basename } from '@/lib/paths';
 
 const SOURCE = 'markdown-toolbar';
 
@@ -246,4 +248,57 @@ export function insertHorizontalRule(editor: editor.IStandaloneCodeEditor) {
   const { selection } = picked;
   replaceSelection(editor, selection, '\n---\n');
   editor.focus();
+}
+
+export function wikiLinkTargetForPath(path: string): string {
+  const name = basename(path);
+  if (name.toLowerCase().endsWith('.md')) return name.slice(0, -3);
+  const dot = name.lastIndexOf('.');
+  return dot > 0 ? name.slice(0, dot) : name;
+}
+
+export function insertAtClientPoint(
+  editor: editor.IStandaloneCodeEditor,
+  clientX: number,
+  clientY: number,
+  text: string
+) {
+  const model = getModel(editor);
+  if (!model) return;
+
+  const target = editor.getTargetAtClientPoint(clientX, clientY);
+  const position =
+    target?.position ??
+    editor.getPosition() ?? {
+      lineNumber: 1,
+      column: 1
+    };
+
+  const range = {
+    startLineNumber: position.lineNumber,
+    startColumn: position.column,
+    endLineNumber: position.lineNumber,
+    endColumn: position.column
+  };
+
+  editor.executeEdits(SOURCE, [{ range, text, forceMoveMarkers: true }]);
+  editor.focus();
+}
+
+export function insertWikiLinkForPath(
+  editor: editor.IStandaloneCodeEditor,
+  targetPath: string,
+  clientX: number,
+  clientY: number
+) {
+  insertAtClientPoint(editor, clientX, clientY, `[[${wikiLinkTargetForPath(targetPath)}]]`);
+}
+
+export function insertFileEmbedForPath(
+  editor: editor.IStandaloneCodeEditor,
+  targetPath: string,
+  clientX: number,
+  clientY: number
+) {
+  insertAtClientPoint(editor, clientX, clientY, formatFileEmbed(targetPath, []));
 }

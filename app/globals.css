@@ -157,6 +157,12 @@ html.tauri-overlay .monaco-editor textarea.inputarea {
   outline-offset: -1px;
 }
 
+body.is-editor-file-drop [data-editor-drop-zone] {
+  outline: 2px solid color-mix(in srgb, var(--cv-amber) 70%, transparent);
+  outline-offset: -2px;
+  background-color: color-mix(in srgb, var(--cv-amber) 6%, transparent);
+}
+
 .markdown-preview h1,
 .markdown-preview h2,
 .markdown-preview h3,

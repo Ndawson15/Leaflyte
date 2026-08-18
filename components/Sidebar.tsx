@@ -16,6 +16,7 @@ import FileTypeIcon from '@/components/FileTypeIcon';
 import TitleDrag from '@/components/TitleDrag';
 import UpdateButton from '@/components/UpdateButton';
 import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
+import { dispatchVaultFileDrop } from '@/lib/vaultDrag';
 
 const ICON = { size: 15, strokeWidth: 1.75, className: 'shrink-0' as const };
 type Creating = { parent: string; kind: 'file' | 'folder' };
@@ -97,6 +98,7 @@ export default function Sidebar({
   const setVaultDragging = (active: boolean) => {
     sidebarRef.current?.classList.toggle('is-vault-dragging', active);
     document.body.classList.remove('is-vault-dragging');
+    if (!active) document.body.classList.remove('is-editor-file-drop');
   };
 
   const clearTextSelection = () => {
@@ -229,6 +231,13 @@ export default function Sidebar({
       if (dragPathRef.current !== d.path) setDragging(d.path);
       const el = document.elementFromPoint(e.clientX, e.clientY);
       const inVault = el?.closest('[data-vault-sidebar]');
+      const editorZone = el?.closest('[data-editor-drop-zone]') as HTMLElement | null;
+      const canDropOnEditor =
+        d.kind === 'file' &&
+        editorZone &&
+        editorZone.dataset.editorPath &&
+        editorZone.dataset.editorPath !== d.path;
+      document.body.classList.toggle('is-editor-file-drop', !!canDropOnEditor);
       const target = inVault ? dropTargetFromEvent({ target: el }) : null;
       setDropTarget(target ? highlightFor(d.path, target) : null);
       setGhost({ x: e.clientX, y: e.clientY, name: d.name });
@@ -251,7 +260,19 @@ export default function Sidebar({
       }
       suppressClickRef.current = true;
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      if (el?.closest('[data-vault-sidebar]')) {
+      const editorZone = el?.closest('[data-editor-drop-zone]') as HTMLElement | null;
+      if (
+        d.kind === 'file' &&
+        editorZone?.dataset.editorPath &&
+        editorZone.dataset.editorPath !== d.path
+      ) {
+        dispatchVaultFileDrop({
+          sourcePath: d.path,
+          hostPath: editorZone.dataset.editorPath,
+          clientX: e.clientX,
+          clientY: e.clientY
+        });
+      } else if (el?.closest('[data-vault-sidebar]')) {
         handleMove(d.path, dropTargetFromEvent({ target: el }));
       }
       endDrag(d);

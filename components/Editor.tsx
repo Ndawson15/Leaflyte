@@ -10,10 +10,16 @@ import { isMarkdownLikePath, supportsReadView } from '@/lib/fileKind';
 import { resolveWikiTarget } from '@/lib/wikiLinks';
 import type { MarkdownViewMode } from '@/lib/themes';
 import FilePreview from '@/components/FilePreview';
+import FileInsertPopover from '@/components/FileInsertPopover';
 import { useShortcut } from './KeymapProvider';
 import TitleDrag from '@/components/TitleDrag';
 import * as vault from '@/lib/vaultClient';
 import { languageForPath } from '@/lib/languageMap';
+import {
+  insertFileEmbedForPath,
+  insertWikiLinkForPath
+} from '@/lib/markdownEdit';
+import { VAULT_FILE_DROP_EVENT, type VaultFileDropDetail } from '@/lib/vaultDrag';
 
 interface EditorProps {
   path: string;
@@ -51,6 +57,11 @@ export default function Editor({
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const [monacoEditor, setMonacoEditor] = useState<editor.IStandaloneCodeEditor | null>(null);
   const editorShellRef = useRef<HTMLDivElement | null>(null);
+  const [insertMenu, setInsertMenu] = useState<{
+    sourcePath: string;
+    clientX: number;
+    clientY: number;
+  } | null>(null);
   const { markdownToolbar } = useEditorSettings();
   const canRead = supportsReadView(path);
   const isMarkdown = isMarkdownLikePath(path);
@@ -75,8 +86,34 @@ export default function Editor({
     setStatus('saved');
     editorRef.current = null;
     setMonacoEditor(null);
+    setInsertMenu(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
+
+  useEffect(() => {
+    const onVaultFileDrop = (event: Event) => {
+      const detail = (event as CustomEvent<VaultFileDropDetail>).detail;
+      if (detail.hostPath !== path || reading || !isMarkdown) return;
+      setInsertMenu({
+        sourcePath: detail.sourcePath,
+        clientX: detail.clientX,
+        clientY: detail.clientY
+      });
+    };
+    window.addEventListener(VAULT_FILE_DROP_EVENT, onVaultFileDrop);
+    return () => window.removeEventListener(VAULT_FILE_DROP_EVENT, onVaultFileDrop);
+  }, [path, reading, isMarkdown]);
+
+  const applyInsert = (mode: 'link' | 'embed') => {
+    if (!insertMenu || !monacoEditor) return;
+    const { sourcePath, clientX, clientY } = insertMenu;
+    if (mode === 'link') {
+      insertWikiLinkForPath(monacoEditor, sourcePath, clientX, clientY);
+    } else {
+      insertFileEmbedForPath(monacoEditor, sourcePath, clientX, clientY);
+    }
+    setInsertMenu(null);
+  };
 
   const scheduleSave = (next: string) => {
     if (statusRef.current !== 'unsaved') setStatus('unsaved');
@@ -159,9 +196,23 @@ export default function Editor({
             onWikiNavigate={handleWikiNavigate}
           />
         ) : (
-          <div ref={editorShellRef} className="relative min-h-0 h-full">
+          <div
+            ref={editorShellRef}
+            data-editor-drop-zone
+            data-editor-path={path}
+            className="relative min-h-0 h-full"
+          >
             {showMarkdownToolbar && (
               <MarkdownBubbleMenu editor={monacoEditor} containerRef={editorShellRef} />
+            )}
+            {insertMenu && (
+              <FileInsertPopover
+                point={{ x: insertMenu.clientX, y: insertMenu.clientY }}
+                sourcePath={insertMenu.sourcePath}
+                onInsertLink={() => applyInsert('link')}
+                onInsertEmbed={() => applyInsert('embed')}
+                onClose={() => setInsertMenu(null)}
+              />
             )}
             <MonacoSurface
               key={path}
