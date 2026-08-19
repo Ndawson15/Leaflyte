@@ -20,7 +20,7 @@ src-tauri/target/
 src-tauri/.tauri-signing.key
 
 # Local dev vault (your notes — not part of the app source)
-vault/
+/vault/
 
 # Secrets & local config (never commit real keys)
 .env

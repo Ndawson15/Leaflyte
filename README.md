@@ -25,7 +25,9 @@ npm install
 npm run dev
 ```
 
-Open `http://<your-lan-ip>:1420` (avoid `localhost` — Cursor can intercept it and blank the page). Notes are read/written from `./vault`.
+Open `http://127.0.0.1:1420` (or `http://localhost:1420`). Notes are read/written from `./vault`.
+
+For LAN access (e.g. VS Code capture from another machine), run `npm run dev:lan` and open `http://<your-lan-ip>:1420`.
 
 ## Desktop (Tauri)
 
@@ -66,40 +68,18 @@ Command palette → **Find and replace in vault** confirms per file before writi
 
 ## VS Code / Cursor capture
 
-See [`extensions/leaflyte-capture`](extensions/leaflyte-capture). Select code → **Leaflyte: Capture Selection** (⌘⇧L) → `POST /api/capture` creates a vault note with the right extension.
-
-## Running with Docker (for your Unraid box)
-
-```bash
-docker compose up -d --build
-```
-
-By default this mounts `./vault` from the compose file's directory. On
-Unraid, point the volume at a real appdata path so notes persist across
-container rebuilds, e.g. in `docker-compose.yml`:
-
-```yaml
-volumes:
-  - /mnt/user/appdata/leaflyte/vault:/app/vault
-```
-
-The app listens on port 3000 inside the container, mapped to `3300` on the
-host by default — change that mapping in `docker-compose.yml` if you'd
-rather use something else. Once it's running, `http://<unraid-ip>:3300`
-gets you the app from anywhere on your LAN, same pattern as your Metabase
-kiosk setup.
+See [`extensions/leaflyte-capture`](extensions/leaflyte-capture). Select code → **Leaflyte: Capture Selection** (⌘⇧L) → `POST /api/capture` creates a vault note with the right extension. Requires Leaflyte running locally (`npm run dev` or `npm run dev:lan` for cross-device capture on your LAN).
 
 ## Notes on the current MVP
 
 - **CFML** has its own editor grammar (`.cfm`, `.cfc`, `.cfml`, `.cfs`, `.cfr`): ColdFusion tags, `<!--- --->` comments, `#expression#`, `<cfscript>`, and SQL inside `<cfquery>`. Other extensions map to Monaco’s built-in languages; unknown types still save as plain text.
 - **Markdown preview** uses GFM (tables, task lists, highlighted fences, images, Mermaid). Split view: edit → split → read via ⌘⇧E.
 - **Monaco** is bundled for desktop; the browser/dev server may still load Monaco from a CDN.
-- **No auth** — this is designed to sit on your LAN / behind Tailscale, not
-  be exposed to the open internet. Add a reverse-proxy auth layer (or
-  Tailscale Serve/Funnel with ACLs) before exposing it more broadly.
+- **No auth on the dev server** — `npm run dev` binds to `127.0.0.1` by default. Use `npm run dev:lan` only on a network you trust; add a reverse-proxy auth layer before exposing it more broadly.
 
 ## Where this goes next
 
-1. **Tailscale** — put the container on your tailnet so it's reachable when you're out.
-2. **Mobile PWA** — once on Tailscale, an installable web app covers most phone use.
-3. **SQLite FTS5** — if vault search outgrows in-process scan.
+1. **Self-hosted sync** — optional Docker/server package plus in-app “connect to your sync server” settings (not built yet; today the desktop app uses local folders only).
+2. **Tailscale** — reach a self-hosted instance when you're away from home.
+3. **Mobile PWA** — installable web UI once a sync endpoint is reachable on your tailnet.
+4. **SQLite FTS5** — if vault search outgrows in-process scan.

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { normalizeCompatibleBaseUrl } from '@/lib/ai/config';
+import { assertSafeCompatibleBaseUrl } from '@/lib/ai/urlSafety';
 
 type ChatMessage = { role: string; content: string };
 
@@ -42,8 +42,7 @@ async function openaiCompatibleChat(
   messages: ChatMessage[],
   baseUrl: string
 ): Promise<string> {
-  const root = normalizeCompatibleBaseUrl(baseUrl);
-  if (!root) throw new Error('Base URL is required');
+  const root = assertSafeCompatibleBaseUrl(baseUrl);
   if (!model.trim()) throw new Error('Model is required');
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -92,7 +91,13 @@ export async function POST(req: NextRequest) {
     } else if (provider === 'openai') {
       content = await openaiCompatibleChat(apiKey, model, system, messages, 'https://api.openai.com/v1');
     } else if (provider === 'openai-compatible') {
-      content = await openaiCompatibleChat(apiKey, model, system, messages, baseUrl);
+      content = await openaiCompatibleChat(
+        apiKey,
+        model,
+        system,
+        messages,
+        assertSafeCompatibleBaseUrl(baseUrl)
+      );
     }
 
     if (content === null) {

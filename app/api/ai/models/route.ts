@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { normalizeCompatibleBaseUrl } from '@/lib/ai/config';
+import { assertSafeCompatibleBaseUrl } from '@/lib/ai/urlSafety';
 import { isOpenAiChatModel, type AiModelOption } from '@/lib/ai/models';
 
 type AnthropicModelsResponse = {
@@ -46,8 +46,7 @@ async function anthropicModels(apiKey: string): Promise<AiModelOption[]> {
 }
 
 async function openaiCompatibleModels(apiKey: string, baseUrl: string): Promise<AiModelOption[]> {
-  const root = normalizeCompatibleBaseUrl(baseUrl);
-  if (!root) throw new Error('Base URL is required');
+  const root = assertSafeCompatibleBaseUrl(baseUrl);
 
   const headers: Record<string, string> = {};
   if (apiKey.trim()) headers.Authorization = `Bearer ${apiKey.trim()}`;

@@ -48,10 +48,8 @@ function uniquePath(folder: string, stem: string, ext: string): string {
 }
 
 export async function GET() {
-  const vaultPath = getVaultDir();
   return NextResponse.json({
     ok: true,
-    vaultPath,
     message: 'Leaflyte capture is ready'
   });
 }

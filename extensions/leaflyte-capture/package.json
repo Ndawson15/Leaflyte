@@ -2,8 +2,13 @@
   "name": "leaflyte-capture",
   "displayName": "Leaflyte Capture",
   "description": "Send the current selection (or file) into your Leaflyte vault as a real note with the right extension.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "leaflyte",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#243528",
+    "theme": "dark"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },

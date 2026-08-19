@@ -27,7 +27,7 @@ The extension calls `GET /api/vault` on Leaflyte to discover whichever vault fol
 
 ## Settings
 
-- `leaflyte.captureUrl` — default `http://127.0.0.1:1420/api/capture` (use your Docker/LAN URL if needed)
+- `leaflyte.captureUrl` — default `http://127.0.0.1:1420/api/capture` (use your LAN URL with `npm run dev:lan` if needed)
 - `leaflyte.captureFolder` — vault-relative folder (default `captures`)
 
 Works in Cursor the same way as VS Code.
