@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './NavBar.module.css';
 
-var LINKS = [
-  { href: '#features', label: 'Features' },
-  { href: '#how-it-works', label: 'How it Works' },
-  { href: '#pricing', label: 'Pricing' },
-];
-
 function NavBar() {
   var scrolled = useState(false);
   var isScrolled = scrolled[0];
@@ -31,16 +25,6 @@ function NavBar() {
           <img src="/assets/leaflyte.png" width="28" height="28" alt="" />
           <span>Leaflyte</span>
         </a>
-
-        <nav className={styles.nav} aria-label="Primary">
-          {LINKS.map(function (link) {
-            return (
-              <a key={link.label} href={link.href}>
-                {link.label}
-              </a>
-            );
-          })}
-        </nav>
       </div>
     </header>
   );
