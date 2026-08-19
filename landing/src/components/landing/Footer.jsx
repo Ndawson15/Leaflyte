@@ -12,7 +12,7 @@ var PRODUCT_LINKS = [
 
 var PLATFORM_LINKS = [
   { label: 'macOS', href: 'downloads/Leaflyte.dmg' },
-  { label: 'Windows', href: 'downloads/Leaflyte-setup.exe' },
+  { label: 'Windows (ARM64)', href: 'downloads/Leaflyte-setup.exe' },
   { label: 'Linux', href: '#get-started' },
 ];
 

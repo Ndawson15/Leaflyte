@@ -19,7 +19,8 @@ tsconfig.tsbuildinfo
 src-tauri/target/
 src-tauri/.tauri-signing.key
 
-# Local dev vault (your notes — not part of the app source)
+# Local build outputs (copy into landing/downloads manually)
+dist-windows/
 /vault/
 
 # Secrets & local config (never commit real keys)
