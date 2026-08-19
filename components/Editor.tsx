@@ -1,6 +1,6 @@
 'use client';
 
-import { Eye, Pencil } from 'lucide-react';
+import { Columns2, Eye, Pencil } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { editor } from 'monaco-editor';
 import MonacoSurface from '@/components/MonacoSurface';
@@ -66,7 +66,10 @@ export default function Editor({
   const canRead = supportsReadView(path);
   const isMarkdown = isMarkdownLikePath(path);
   const reading = canRead && fileViewMode === 'read';
-  const showMarkdownToolbar = markdownToolbar && isMarkdown && !reading;
+  const split = canRead && isMarkdown && fileViewMode === 'split';
+  const showEditor = !reading;
+  const showPreview = reading || split;
+  const showMarkdownToolbar = markdownToolbar && isMarkdown && showEditor;
 
   allFilesRef.current = allFiles;
   fileContentsRef.current = fileContents;
@@ -89,6 +92,10 @@ export default function Editor({
     setInsertMenu(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
+
+  useEffect(() => {
+    if (split) setReadSource(value);
+  }, [value, split]);
 
   useEffect(() => {
     const onVaultFileDrop = (event: Event) => {
@@ -148,14 +155,103 @@ export default function Editor({
     if (resolved) onNavigateRef.current(resolved);
   };
 
-  const toggleViewMode = () => {
+  const cycleViewMode = () => {
     if (!canRead || !onFileViewModeChange) return;
-    if (!reading) {
+    if (fileViewMode === 'edit') {
       valueRef.current = value;
       setReadSource(value);
+      onFileViewModeChange(isMarkdown ? 'split' : 'read');
+    } else if (fileViewMode === 'split') {
+      valueRef.current = value;
+      setReadSource(value);
+      onFileViewModeChange('read');
+    } else {
+      onFileViewModeChange('edit');
     }
-    onFileViewModeChange(reading ? 'edit' : 'read');
   };
+
+  const viewIcon =
+    fileViewMode === 'read' ? (
+      <Pencil size={15} strokeWidth={1.75} />
+    ) : fileViewMode === 'split' ? (
+      <Eye size={15} strokeWidth={1.75} />
+    ) : isMarkdown ? (
+      <Columns2 size={15} strokeWidth={1.75} />
+    ) : (
+      <Eye size={15} strokeWidth={1.75} />
+    );
+
+  const viewTitle =
+    fileViewMode === 'read'
+      ? 'Switch to edit mode (⌘⇧E)'
+      : fileViewMode === 'split'
+        ? 'Switch to read mode (⌘⇧E)'
+        : isMarkdown
+          ? 'Switch to split view (⌘⇧E)'
+          : 'Switch to read mode (⌘⇧E)';
+
+  const editorPane = (
+    <div
+      ref={editorShellRef}
+      data-editor-drop-zone
+      data-editor-path={path}
+      className="relative min-h-0 h-full"
+    >
+      {showMarkdownToolbar && (
+        <MarkdownBubbleMenu editor={monacoEditor} containerRef={editorShellRef} />
+      )}
+      {insertMenu && (
+        <FileInsertPopover
+          point={{ x: insertMenu.clientX, y: insertMenu.clientY }}
+          sourcePath={insertMenu.sourcePath}
+          onInsertLink={() => applyInsert('link')}
+          onInsertEmbed={() => applyInsert('embed')}
+          onClose={() => setInsertMenu(null)}
+        />
+      )}
+      <MonacoSurface
+        key={path}
+        height="100%"
+        language={languageForPath(path)}
+        value={value}
+        onMount={(ed) => {
+          editorRef.current = ed;
+          setMonacoEditor(ed);
+          ed.focus();
+        }}
+        onChange={(v) => {
+          const next = v ?? '';
+          setValue(next);
+          onLiveChange(path, next);
+          scheduleSave(next);
+        }}
+        loading={<div className="h-full bg-bg" />}
+        options={{
+          fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+          fontSize: 13,
+          minimap: { enabled: false },
+          wordWrap: 'on',
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+          links: true,
+          readOnly: false,
+          editContext: false
+        }}
+      />
+    </div>
+  );
+
+  const previewPane = (
+    <FilePreview
+      path={path}
+      source={split ? value : readSource}
+      files={allFiles}
+      readFile={readVaultFile}
+      onOpenFile={(filePath) => onNavigateRef.current(filePath)}
+      onSourceChange={updateReadSource}
+      onWikiNavigate={handleWikiNavigate}
+    />
+  );
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -165,19 +261,19 @@ export default function Editor({
         {canRead && onFileViewModeChange && (
           <button
             type="button"
-            onClick={toggleViewMode}
-            title={reading ? 'Switch to edit mode (⌘⇧E)' : 'Switch to read mode (⌘⇧E)'}
-            aria-label={reading ? 'Switch to edit mode' : 'Switch to read mode'}
+            onClick={cycleViewMode}
+            title={viewTitle}
+            aria-label={viewTitle}
             className={`shrink-0 w-7 h-7 flex items-center justify-center rounded-md ${
-              reading
+              reading || split
                 ? 'text-amber bg-surface2'
                 : 'text-muted hover:text-text hover:bg-surface2'
             }`}
           >
-            {reading ? <Pencil size={15} strokeWidth={1.75} /> : <Eye size={15} strokeWidth={1.75} />}
+            {viewIcon}
           </button>
         )}
-        {!reading && (
+        {showEditor && (
           <span className={status === 'saved' ? 'text-teal' : status === 'saving' ? 'text-muted' : 'text-amber'}>
             {status === 'saved' ? 'saved' : status === 'saving' ? 'saving…' : 'unsaved'}
           </span>
@@ -185,65 +281,15 @@ export default function Editor({
       </div>
       {showMarkdownToolbar && <MarkdownToolbar editor={monacoEditor} />}
       <div className="flex-1 min-h-0 overflow-hidden">
-        {reading ? (
-          <FilePreview
-            path={path}
-            source={readSource}
-            files={allFiles}
-            readFile={readVaultFile}
-            onOpenFile={(filePath) => onNavigateRef.current(filePath)}
-            onSourceChange={updateReadSource}
-            onWikiNavigate={handleWikiNavigate}
-          />
-        ) : (
-          <div
-            ref={editorShellRef}
-            data-editor-drop-zone
-            data-editor-path={path}
-            className="relative min-h-0 h-full"
-          >
-            {showMarkdownToolbar && (
-              <MarkdownBubbleMenu editor={monacoEditor} containerRef={editorShellRef} />
-            )}
-            {insertMenu && (
-              <FileInsertPopover
-                point={{ x: insertMenu.clientX, y: insertMenu.clientY }}
-                sourcePath={insertMenu.sourcePath}
-                onInsertLink={() => applyInsert('link')}
-                onInsertEmbed={() => applyInsert('embed')}
-                onClose={() => setInsertMenu(null)}
-              />
-            )}
-            <MonacoSurface
-              key={path}
-              height="100%"
-              language={languageForPath(path)}
-              value={value}
-              onMount={(editor) => {
-                editorRef.current = editor;
-                setMonacoEditor(editor);
-                editor.focus();
-              }}
-              onChange={(v) => {
-                const next = v ?? '';
-                setValue(next);
-                onLiveChange(path, next);
-                scheduleSave(next);
-              }}
-              loading={<div className="h-full bg-bg" />}
-              options={{
-                fontFamily: 'JetBrains Mono, ui-monospace, monospace',
-                fontSize: 13,
-                minimap: { enabled: false },
-                wordWrap: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                links: true,
-                readOnly: false,
-                editContext: false
-              }}
-            />
+        {split ? (
+          <div className="flex h-full min-h-0">
+            <div className="flex-1 min-w-0 border-r border-border">{editorPane}</div>
+            <div className="flex-1 min-w-0 overflow-hidden">{previewPane}</div>
           </div>
+        ) : reading ? (
+          previewPane
+        ) : (
+          editorPane
         )}
       </div>
     </div>

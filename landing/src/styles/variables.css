@@ -1,0 +1,32 @@
+:root {
+  /* Leaf palette — swap when branding is final */
+  --color-sage: #9cb39a;
+  --color-moss: #4a6b52;
+  --color-forest: #243528;
+  --color-cream: #f6f3eb;
+  --color-mist: #eef2ea;
+  --color-surface: #ffffff;
+  --color-accent: #c47a52;
+  --color-accent-soft: rgba(196, 122, 82, 0.18);
+  --color-text: #1a241c;
+  --color-text-muted: #5f6f62;
+  --color-border: rgba(36, 53, 40, 0.1);
+  --color-shadow: rgba(36, 53, 40, 0.08);
+  --color-shadow-strong: rgba(36, 53, 40, 0.14);
+
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Source Sans 3', 'Helvetica Neue', sans-serif;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --nav-height: 72px;
+  --section-gap: clamp(4.5rem, 10vw, 7.5rem);
+  --content-width: 1120px;
+  --content-narrow: 760px;
+
+  --transition-fast: 180ms ease;
+  --transition-base: 280ms ease;
+}

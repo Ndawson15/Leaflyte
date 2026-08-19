@@ -1,0 +1,155 @@
+.section {
+  padding: 0 1rem var(--section-gap);
+}
+
+.header {
+  width: min(var(--content-width), 100%);
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-moss);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 2.75rem);
+  letter-spacing: -0.02em;
+  color: var(--color-forest);
+}
+
+.steps {
+  width: min(var(--content-width), 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+
+.reverse .copy {
+  order: 2;
+}
+
+.reverse .visual {
+  order: 1;
+}
+
+.copy {
+  position: relative;
+  padding: 1.5rem 0;
+}
+
+.ghostNum {
+  position: absolute;
+  top: -0.5rem;
+  left: -0.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 10vw, 6.5rem);
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(74, 107, 82, 0.1);
+  pointer-events: none;
+  user-select: none;
+}
+
+.copy h3 {
+  position: relative;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: var(--color-forest);
+}
+
+.copy p {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--color-text-muted);
+}
+
+.visual > div {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 16px 40px var(--color-shadow);
+}
+
+.terminal {
+  padding: 1.25rem 1.5rem;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--color-moss);
+}
+
+.terminal code {
+  display: block;
+}
+
+.editorMock {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 180px;
+}
+
+.editorPane,
+.previewPane {
+  padding: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.editorPane {
+  background: #1e2420;
+  color: #d8e4d8;
+  border-right: 1px solid var(--color-border);
+}
+
+.editorPane span {
+  display: block;
+}
+
+.previewPane strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-forest);
+}
+
+.previewPane ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--color-text-muted);
+}
+
+.vaultMock {
+  padding: 1.25rem 1.5rem;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: var(--color-moss);
+}
+
+@media (max-width: 768px) {
+  .step,
+  .reverse .copy,
+  .reverse .visual {
+    grid-template-columns: 1fr;
+    order: unset;
+  }
+
+  .copy p {
+    max-width: none;
+  }
+}

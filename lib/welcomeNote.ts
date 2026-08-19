@@ -40,7 +40,7 @@ Add \`#tags\` anywhere in a file (e.g. #ideas #project). Open a note and check t
 | ⌘J | AI chat |
 | ⌘B | Toggle vault sidebar |
 | ⌘⇧B | Toggle links sidebar |
-| ⌘⇧E | Toggle read / edit (markdown & HTML) |
+| ⌘⇧E | Cycle read / split / edit (markdown); read / edit (HTML) |
 | ⌘, | Settings |
 | ⌘N | New file |
 | ⌘⇧N | New folder |
@@ -59,7 +59,7 @@ Relative paths resolve from the HTML file's location. Use the **eye icon** (uppe
 
 ## AI chat
 
-Press **⌘J** to ask questions about your vault — summaries, connections, where something is mentioned, or help drafting from existing notes. Add an API key under **Settings → AI**. Chat history is saved on this device.
+Press **⌘J** to ask questions about your vault — summaries, connections, where something is mentioned, or help drafting from existing notes. Prefer **Settings → AI → Local / OpenAI-compatible** for Ollama or LM Studio, or add a cloud API key. Chat history is saved on this device.
 
 When **Allow file edits** is on, the assistant can propose changes. Click **Preview** in chat to apply them temporarily in the editor, then **Approve** or **Revert** from the banner above the note.
 
@@ -67,8 +67,9 @@ Type **@** in the chat input to tag a file, or drag a note from the sidebar into
 
 ## Search & commands
 
-- **⌘K** searches file names and note contents.
-- **⌘P** opens the command palette for actions like creating files, switching workspaces, and opening settings.
+- **⌘K** searches file names and note contents. Filters: \`ext:ts\`, \`path:src/\`, \`/regex/\`, \`#tag\`.
+- **⌘P** opens the command palette — including **Find and replace in vault**.
+- Customize shortcuts in **Settings → Shortcuts**.
 
 ## Themes
 

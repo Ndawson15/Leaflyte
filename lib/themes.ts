@@ -59,10 +59,10 @@ export const MIN_SIDEBAR_WIDTH = 180;
 export const SNAP_COLLAPSE_WIDTH = 80;
 export const MARKDOWN_VIEW_STORAGE_KEY = 'leaflyte.markdownView';
 
-export type MarkdownViewMode = 'read' | 'edit';
+export type MarkdownViewMode = 'read' | 'edit' | 'split';
 
 export function isMarkdownViewMode(value: string | null): value is MarkdownViewMode {
-  return value === 'read' || value === 'edit';
+  return value === 'read' || value === 'edit' || value === 'split';
 }
 
 export function isThemeId(value: string | null): value is ThemeId {

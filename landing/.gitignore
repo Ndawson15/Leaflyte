@@ -1,4 +1,4 @@
-# Generated locally — Hostinger builds on deploy
+node_modules/
 build/
 dist/
-public/
+*.zip

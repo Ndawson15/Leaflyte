@@ -69,7 +69,7 @@ export default function QuickSwitcher({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKey}
-          placeholder="Search notes by name, content, or #tag…"
+          placeholder="Search — ext:ts path:src/ /regex/ #tag…"
           className="w-full bg-transparent px-4 py-3 text-sm outline-none border-b border-border text-text"
         />
         <ul className="max-h-80 overflow-y-auto">

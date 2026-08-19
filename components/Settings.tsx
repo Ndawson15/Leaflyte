@@ -11,7 +11,7 @@ import { useTheme } from './ThemeProvider';
 import ThemeColorEditor from '@/components/ThemeColorEditor';
 import { useKeymap } from './KeymapProvider';
 import { useAi } from './AiProvider';
-import { AI_PROVIDERS, type AiProvider } from '@/lib/ai/config';
+import { AI_PROVIDERS, LOCAL_ENDPOINT_PRESETS, type AiProvider } from '@/lib/ai/config';
 import AiModelSelect from '@/components/AiModelSelect';
 import WorkspacePanel from '@/components/WorkspacePanel';
 import { useWorkspaces } from '@/components/WorkspaceProvider';
@@ -146,7 +146,7 @@ function GeneralPanel({
             <div className="min-w-0 flex-1">
               <div className="text-sm text-text">Formatting toolbar</div>
               <p className="text-[11px] text-muted mt-0.5">
-                Notion-style toolbar for headings, lists, links, and more. A bubble menu also
+                Markdown formatting toolbar for headings, lists, links, and more. A bubble menu also
                 appears when you highlight text.
               </p>
             </div>
@@ -251,12 +251,14 @@ function ThemePanel() {
 
 function AiPanel() {
   const { config: aiConfig, setConfig: setAiConfig } = useAi();
+  const isLocal = aiConfig.provider === 'openai-compatible';
+  const isCloud = aiConfig.provider === 'anthropic' || aiConfig.provider === 'openai';
 
   return (
     <div className="space-y-6">
       <SettingsSection
         title="Vault AI"
-        description="Bring your own API key. Stored in this browser only (localStorage) — not in git, not on our servers. Sent only to the provider you choose when you use AI chat."
+        description="Prefer a local model (Ollama / LM Studio) or bring a cloud API key. Endpoints and keys stay on this device — not in git, not on our servers."
       >
         <div className="border border-border rounded-lg bg-surface divide-y divide-border">
           <div className="px-4 py-3 space-y-2">
@@ -275,28 +277,96 @@ function AiPanel() {
           </div>
           {aiConfig.provider !== 'off' && (
             <>
-              <div className="px-4 py-3 space-y-2">
-                <label className="text-sm text-text">API key</label>
-                <input
-                  type="password"
-                  value={aiConfig.apiKey}
-                  onChange={(e) => setAiConfig({ ...aiConfig, apiKey: e.target.value })}
-                  placeholder={aiConfig.provider === 'anthropic' ? 'sk-ant-…' : 'sk-…'}
-                  autoComplete="off"
-                  className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-muted font-mono"
-                />
-              </div>
+              {isLocal && (
+                <>
+                  <div className="px-4 py-3 space-y-2">
+                    <label className="text-sm text-text">Endpoint preset</label>
+                    <div className="flex flex-wrap gap-2">
+                      {LOCAL_ENDPOINT_PRESETS.filter((p) => p.id !== 'custom').map((preset) => {
+                        const active =
+                          aiConfig.compatibleBaseUrl.replace(/\/+$/, '') ===
+                          preset.baseUrl.replace(/\/+$/, '');
+                        return (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            onClick={() =>
+                              setAiConfig({ ...aiConfig, compatibleBaseUrl: preset.baseUrl })
+                            }
+                            className={`px-3 py-1.5 rounded-md text-xs border ${
+                              active
+                                ? 'border-amber text-amber bg-bg'
+                                : 'border-border text-muted hover:text-text hover:border-muted'
+                            }`}
+                          >
+                            {preset.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="px-4 py-3 space-y-2">
+                    <label className="text-sm text-text">Base URL</label>
+                    <input
+                      type="url"
+                      value={aiConfig.compatibleBaseUrl}
+                      onChange={(e) =>
+                        setAiConfig({ ...aiConfig, compatibleBaseUrl: e.target.value })
+                      }
+                      placeholder="http://localhost:11434/v1"
+                      className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-muted font-mono"
+                    />
+                    <p className="text-[11px] text-muted">
+                      OpenAI-compatible <code className="text-muted">/v1</code> root. Ollama and LM
+                      Studio work out of the box.
+                    </p>
+                  </div>
+                  <div className="px-4 py-3 space-y-2">
+                    <label className="text-sm text-text">API key (optional)</label>
+                    <input
+                      type="password"
+                      value={aiConfig.apiKey}
+                      onChange={(e) => setAiConfig({ ...aiConfig, apiKey: e.target.value })}
+                      placeholder="Usually blank for local servers"
+                      autoComplete="off"
+                      className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-muted font-mono"
+                    />
+                  </div>
+                </>
+              )}
+              {isCloud && (
+                <div className="px-4 py-3 space-y-2">
+                  <label className="text-sm text-text">API key</label>
+                  <input
+                    type="password"
+                    value={aiConfig.apiKey}
+                    onChange={(e) => setAiConfig({ ...aiConfig, apiKey: e.target.value })}
+                    placeholder={aiConfig.provider === 'anthropic' ? 'sk-ant-…' : 'sk-…'}
+                    autoComplete="off"
+                    className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-muted font-mono"
+                  />
+                </div>
+              )}
               <div className="px-4 py-3 space-y-2">
                 <label className="text-sm text-text">Model</label>
                 <AiModelSelect
                   provider={aiConfig.provider}
                   apiKey={aiConfig.apiKey}
-                  value={aiConfig.provider === 'anthropic' ? aiConfig.anthropicModel : aiConfig.openaiModel}
+                  baseUrl={aiConfig.compatibleBaseUrl}
+                  value={
+                    aiConfig.provider === 'anthropic'
+                      ? aiConfig.anthropicModel
+                      : aiConfig.provider === 'openai-compatible'
+                        ? aiConfig.compatibleModel
+                        : aiConfig.openaiModel
+                  }
                   onChange={(modelId) =>
                     setAiConfig(
                       aiConfig.provider === 'anthropic'
                         ? { ...aiConfig, anthropicModel: modelId }
-                        : { ...aiConfig, openaiModel: modelId }
+                        : aiConfig.provider === 'openai-compatible'
+                          ? { ...aiConfig, compatibleModel: modelId }
+                          : { ...aiConfig, openaiModel: modelId }
                     )
                   }
                 />
@@ -305,7 +375,8 @@ function AiPanel() {
                 <div>
                   <p className="text-sm text-text">Allow file edits</p>
                   <p className="text-[11px] text-muted mt-0.5">
-                    AI can propose vault changes. Click Preview to open edits in the editor, then approve or revert.
+                    AI can propose vault changes. Click Preview to open edits in the editor, then
+                    approve or revert.
                   </p>
                 </div>
                 <Toggle

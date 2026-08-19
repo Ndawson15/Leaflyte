@@ -1,4 +1,5 @@
 import type { AiProvider } from '@/lib/ai/config';
+import { normalizeCompatibleBaseUrl } from '@/lib/ai/config';
 import { isTauri } from '@/lib/vaultClient';
 
 export type AiModelOption = {
@@ -13,16 +14,28 @@ function isOpenAiChatModel(id: string): boolean {
   return /^(gpt-|o[0-9]|chatgpt-)/.test(id);
 }
 
-async function invokeModels(provider: AiProvider, apiKey: string): Promise<AiModelOption[]> {
+async function invokeModels(
+  provider: AiProvider,
+  apiKey: string,
+  baseUrl?: string
+): Promise<AiModelOption[]> {
   const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<AiModelOption[]>('list_ai_models', { provider, apiKey });
+  return invoke<AiModelOption[]>('list_ai_models', {
+    provider,
+    apiKey,
+    baseUrl: baseUrl ?? ''
+  });
 }
 
-async function fetchModels(provider: AiProvider, apiKey: string): Promise<AiModelOption[]> {
+async function fetchModels(
+  provider: AiProvider,
+  apiKey: string,
+  baseUrl?: string
+): Promise<AiModelOption[]> {
   const res = await fetch('/api/ai/models', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ provider, apiKey })
+    body: JSON.stringify({ provider, apiKey, baseUrl })
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error((data as { error?: string }).error ?? res.statusText);
@@ -31,11 +44,14 @@ async function fetchModels(provider: AiProvider, apiKey: string): Promise<AiMode
 
 export async function fetchAiModels(
   provider: Exclude<AiProvider, 'off'>,
-  apiKey: string
+  apiKey: string,
+  baseUrl?: string
 ): Promise<AiModelOption[]> {
-  if (!apiKey.trim()) return [];
-  if (isTauri()) return invokeModels(provider, apiKey);
-  return fetchModels(provider, apiKey);
+  if (provider !== 'openai-compatible' && !apiKey.trim()) return [];
+  if (provider === 'openai-compatible' && !normalizeCompatibleBaseUrl(baseUrl ?? '')) return [];
+  const normalized = normalizeCompatibleBaseUrl(baseUrl ?? '');
+  if (isTauri()) return invokeModels(provider, apiKey, normalized);
+  return fetchModels(provider, apiKey, normalized);
 }
 
 export { isOpenAiChatModel };

@@ -3,6 +3,10 @@ node_modules
 .next
 .next-tauri
 out
+build/
+extensions/*/out
+extensions/*/node_modules
+extensions/*/*.vsix
 public/monaco
 .api-hidden
 next-env.d.ts

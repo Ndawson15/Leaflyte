@@ -7,7 +7,9 @@ import {
   resolveFileEmbedPath,
   updateFileEmbedHeight
 } from '@/lib/fileEmbeds';
+import { resolveRelativePath } from '@/lib/htmlPreview';
 import { markdownToHtml } from '@/lib/markdown';
+import * as vault from '@/lib/vaultClient';
 
 export default function MarkdownPreview({
   path,
@@ -74,7 +76,74 @@ export default function MarkdownPreview({
     };
     el.addEventListener('click', onClick);
     return () => el.removeEventListener('click', onClick);
-  }, [onWikiNavigate]);
+  }, [onWikiNavigate, source]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let cancelled = false;
+
+    const resolveImages = async () => {
+      const images = el.querySelectorAll<HTMLImageElement>('img[data-vault-src]');
+      await Promise.all(
+        [...images].map(async (img) => {
+          const src = img.dataset.vaultSrc;
+          if (!src) return;
+          const resolved =
+            resolveRelativePath(path, src) ??
+            files.find((f) => f.toLowerCase() === src.replace(/^\/+/, '').toLowerCase()) ??
+            null;
+          if (!resolved) return;
+          try {
+            const url = await vault.getAssetUrl(resolved);
+            if (!cancelled) {
+              img.src = url;
+              img.removeAttribute('data-vault-src');
+              img.style.cursor = 'pointer';
+              img.onclick = () => onOpenFile(resolved);
+            }
+          } catch {
+            /* leave unresolved */
+          }
+        })
+      );
+    };
+
+    const runMermaid = async () => {
+      const nodes = el.querySelectorAll<HTMLElement>('pre.mermaid');
+      if (nodes.length === 0) return;
+      const mermaid = (await import('mermaid')).default;
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        theme: document.documentElement.getAttribute('data-theme') === 'paper' ||
+          document.documentElement.getAttribute('data-theme') === 'sepia'
+          ? 'neutral'
+          : 'dark'
+      });
+      // Reset previously processed nodes so re-renders work
+      nodes.forEach((node) => {
+        if (node.getAttribute('data-processed')) {
+          node.removeAttribute('data-processed');
+          node.removeAttribute('data-mermaid-svg');
+        }
+      });
+      try {
+        await mermaid.run({ nodes: [...nodes] });
+      } catch {
+        /* invalid diagrams stay as source */
+      }
+    };
+
+    void (async () => {
+      await resolveImages();
+      if (!cancelled) await runMermaid();
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [path, source, files, onOpenFile]);
 
   return (
     <div

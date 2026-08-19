@@ -1,5 +1,5 @@
-import type { AiConfig } from '@/lib/ai/config';
-import { aiConfigured, modelForProvider } from '@/lib/ai/config';
+import type { AiConfig, AiProvider } from '@/lib/ai/config';
+import { aiConfigured, modelForProvider, normalizeCompatibleBaseUrl } from '@/lib/ai/config';
 import { isTauri } from '@/lib/vaultClient';
 
 export type ChatMessage = {
@@ -20,7 +20,8 @@ async function invokeChat(
     apiKey: config.apiKey,
     model: modelForProvider(config),
     system,
-    messages
+    messages,
+    baseUrl: normalizeCompatibleBaseUrl(config.compatibleBaseUrl)
   });
 }
 
@@ -33,7 +34,8 @@ async function fetchChat(config: AiConfig, system: string, messages: ChatMessage
       apiKey: config.apiKey,
       model: modelForProvider(config),
       system,
-      messages
+      messages,
+      baseUrl: normalizeCompatibleBaseUrl(config.compatibleBaseUrl)
     })
   });
   const data = await res.json().catch(() => ({}));
@@ -47,8 +49,17 @@ export async function sendAiChat(
   messages: ChatMessage[]
 ): Promise<string> {
   if (!aiConfigured(config)) {
-    throw new Error('Add an API key in Settings → AI to use chat.');
+    throw new Error(
+      config.provider === 'openai-compatible'
+        ? 'Set a local endpoint in Settings → AI (Ollama / LM Studio).'
+        : 'Add an API key in Settings → AI to use chat.'
+    );
+  }
+  if (config.provider === 'openai-compatible' && !modelForProvider(config).trim()) {
+    throw new Error('Pick a local model in Settings → AI.');
   }
   if (isTauri()) return invokeChat(config, system, messages);
   return fetchChat(config, system, messages);
 }
+
+export type { AiProvider };

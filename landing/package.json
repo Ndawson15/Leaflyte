@@ -1,13 +1,24 @@
 {
   "name": "leaflyte-landing",
   "private": true,
-  "version": "0.2.0",
-  "description": "Leaflyte marketing site — static HTML for leaflyte.app",
+  "version": "0.3.0",
+  "description": "Leaflyte marketing site — React SPA for leaflyte.app",
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "build": "node scripts/build.mjs"
+    "dev": "vite",
+    "build": "node scripts/build.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "framer-motion": "6.5.1",
+    "react": "16.14.0",
+    "react-dom": "16.14.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
   }
 }

@@ -4,6 +4,7 @@ import MonacoEditor from '@monaco-editor/react';
 import type { ComponentProps } from 'react';
 import { useEffect, useState } from 'react';
 import { ensureMonacoLoader } from '@/lib/monacoSetup';
+import { installClipboardBridge } from '@/lib/clipboardBridge';
 import { isTauri } from '@/lib/vaultClient';
 
 type Props = ComponentProps<typeof MonacoEditor>;
@@ -15,7 +16,7 @@ export default function MonacoSurface(props: Props) {
   useEffect(() => {
     if (!isTauri()) return;
     let cancelled = false;
-    ensureMonacoLoader()
+    Promise.all([ensureMonacoLoader(), installClipboardBridge()])
       .then(() => {
         if (!cancelled) setReady(true);
       })

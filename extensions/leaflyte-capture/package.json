@@ -1,0 +1,67 @@
+{
+  "name": "leaflyte-capture",
+  "displayName": "Leaflyte Capture",
+  "description": "Send the current selection (or file) into your Leaflyte vault as a real note with the right extension.",
+  "version": "0.1.0",
+  "publisher": "leaflyte",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other", "Notebooks"],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:leaflyte.captureSelection",
+    "onCommand:leaflyte.captureFile",
+    "onCommand:leaflyte.refreshVault"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "leaflyte.captureSelection",
+        "title": "Leaflyte: Capture Selection"
+      },
+      {
+        "command": "leaflyte.captureFile",
+        "title": "Leaflyte: Capture Current File"
+      },
+      {
+        "command": "leaflyte.refreshVault",
+        "title": "Leaflyte: Connect to Vault"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "leaflyte.captureSelection",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Leaflyte Capture",
+      "properties": {
+        "leaflyte.captureUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:1420/api/capture",
+          "description": "Leaflyte app URL for capture (must match the running Leaflyte dev server or desktop app)."
+        },
+        "leaflyte.captureFolder": {
+          "type": "string",
+          "default": "captures",
+          "description": "Subfolder inside the active vault for captured files."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -watch -p .",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.5.0"
+  }
+}

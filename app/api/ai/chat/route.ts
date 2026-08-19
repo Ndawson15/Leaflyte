@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { normalizeCompatibleBaseUrl } from '@/lib/ai/config';
 
 type ChatMessage = { role: string; content: string };
 
@@ -34,18 +35,23 @@ async function anthropicChat(
     .join('');
 }
 
-async function openaiChat(
+async function openaiCompatibleChat(
   apiKey: string,
   model: string,
   system: string,
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  baseUrl: string
 ): Promise<string> {
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const root = normalizeCompatibleBaseUrl(baseUrl);
+  if (!root) throw new Error('Base URL is required');
+  if (!model.trim()) throw new Error('Model is required');
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (apiKey.trim()) headers.Authorization = `Bearer ${apiKey.trim()}`;
+
+  const res = await fetch(`${root}/chat/completions`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`
-    },
+    headers,
     body: JSON.stringify({
       model,
       max_tokens: 4096,
@@ -64,27 +70,30 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const provider = body?.provider as string;
-    const apiKey = body?.apiKey as string;
+    const apiKey = (body?.apiKey as string) ?? '';
     const model = body?.model as string;
     const system = body?.system as string;
     const messages = (body?.messages ?? []) as ChatMessage[];
+    const baseUrl = (body?.baseUrl as string) ?? '';
 
     if (!provider || provider === 'off') {
       return NextResponse.json({ error: 'AI provider not configured' }, { status: 400 });
     }
-    if (!apiKey?.trim()) {
+    if (provider !== 'openai-compatible' && !apiKey?.trim()) {
       return NextResponse.json({ error: 'API key is required' }, { status: 400 });
     }
     if (!system || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 
-    const content =
-      provider === 'anthropic'
-        ? await anthropicChat(apiKey, model, system, messages)
-        : provider === 'openai'
-          ? await openaiChat(apiKey, model, system, messages)
-          : null;
+    let content: string | null = null;
+    if (provider === 'anthropic') {
+      content = await anthropicChat(apiKey, model, system, messages);
+    } else if (provider === 'openai') {
+      content = await openaiCompatibleChat(apiKey, model, system, messages, 'https://api.openai.com/v1');
+    } else if (provider === 'openai-compatible') {
+      content = await openaiCompatibleChat(apiKey, model, system, messages, baseUrl);
+    }
 
     if (content === null) {
       return NextResponse.json({ error: 'Unknown provider' }, { status: 400 });

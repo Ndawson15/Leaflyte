@@ -43,6 +43,18 @@ struct ApiErrorBody {
     message: String,
 }
 
+fn normalize_base_url(url: &str) -> String {
+    let trimmed = url.trim().trim_end_matches('/');
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    if trimmed.to_lowercase().ends_with("/v1") {
+        trimmed.to_string()
+    } else {
+        format!("{trimmed}/v1")
+    }
+}
+
 async fn anthropic_chat(
     api_key: &str,
     model: &str,
@@ -84,29 +96,40 @@ async fn anthropic_chat(
         .join(""))
 }
 
-async fn openai_chat(
+async fn openai_compatible_chat(
     api_key: &str,
     model: &str,
     system: &str,
     messages: &[ChatMessage],
+    base_url: &str,
 ) -> Result<String, String> {
+    let root = normalize_base_url(base_url);
+    if root.is_empty() {
+        return Err("Base URL is required".into());
+    }
+    if model.trim().is_empty() {
+        return Err("Model is required".into());
+    }
+
     let mut api_messages = vec![serde_json::json!({ "role": "system", "content": system })];
     for m in messages {
         api_messages.push(serde_json::json!({ "role": m.role, "content": m.content }));
     }
 
     let client = reqwest::Client::new();
-    let res = client
-        .post("https://api.openai.com/v1/chat/completions")
-        .bearer_auth(api_key)
+    let mut req = client
+        .post(format!("{root}/chat/completions"))
         .json(&serde_json::json!({
             "model": model,
             "max_tokens": 4096,
             "messages": api_messages,
-        }))
-        .send()
-        .await
-        .map_err(|e| e.to_string())?;
+        }));
+
+    if !api_key.trim().is_empty() {
+        req = req.bearer_auth(api_key.trim());
+    }
+
+    let res = req.send().await.map_err(|e| e.to_string())?;
 
     let status = res.status();
     let body = res.text().await.map_err(|e| e.to_string())?;
@@ -222,14 +245,22 @@ async fn anthropic_models(api_key: &str) -> Result<Vec<AiModelOption>, String> {
     Ok(models)
 }
 
-async fn openai_models(api_key: &str) -> Result<Vec<AiModelOption>, String> {
+async fn openai_compatible_models(
+    api_key: &str,
+    base_url: &str,
+) -> Result<Vec<AiModelOption>, String> {
+    let root = normalize_base_url(base_url);
+    if root.is_empty() {
+        return Err("Base URL is required".into());
+    }
+
     let client = reqwest::Client::new();
-    let res = client
-        .get("https://api.openai.com/v1/models")
-        .bearer_auth(api_key)
-        .send()
-        .await
-        .map_err(|e| e.to_string())?;
+    let mut req = client.get(format!("{root}/models"));
+    if !api_key.trim().is_empty() {
+        req = req.bearer_auth(api_key.trim());
+    }
+
+    let res = req.send().await.map_err(|e| e.to_string())?;
 
     let status = res.status();
     let body = res.text().await.map_err(|e| e.to_string())?;
@@ -245,12 +276,18 @@ async fn openai_models(api_key: &str) -> Result<Vec<AiModelOption>, String> {
         .data
         .unwrap_or_default()
         .into_iter()
-        .filter(|m| is_openai_chat_model(&m.id))
         .map(|m| AiModelOption {
             id: m.id.clone(),
             label: m.id,
         })
         .collect();
+    models.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(models)
+}
+
+async fn openai_models(api_key: &str) -> Result<Vec<AiModelOption>, String> {
+    let mut models = openai_compatible_models(api_key, "https://api.openai.com/v1").await?;
+    models.retain(|m| is_openai_chat_model(&m.id));
     models.sort_by(|a, b| b.id.cmp(&a.id));
     Ok(models)
 }
@@ -259,13 +296,24 @@ async fn openai_models(api_key: &str) -> Result<Vec<AiModelOption>, String> {
 pub async fn list_ai_models(
     provider: String,
     api_key: String,
+    base_url: Option<String>,
 ) -> Result<Vec<AiModelOption>, String> {
-    if api_key.trim().is_empty() {
-        return Err("API key is required".into());
-    }
     match provider.as_str() {
-        "anthropic" => anthropic_models(&api_key).await,
-        "openai" => openai_models(&api_key).await,
+        "anthropic" => {
+            if api_key.trim().is_empty() {
+                return Err("API key is required".into());
+            }
+            anthropic_models(&api_key).await
+        }
+        "openai" => {
+            if api_key.trim().is_empty() {
+                return Err("API key is required".into());
+            }
+            openai_models(&api_key).await
+        }
+        "openai-compatible" => {
+            openai_compatible_models(&api_key, base_url.as_deref().unwrap_or("")).await
+        }
         _ => Err("Unknown AI provider".into()),
     }
 }
@@ -277,13 +325,38 @@ pub async fn ai_chat(
     model: String,
     system: String,
     messages: Vec<ChatMessage>,
+    base_url: Option<String>,
 ) -> Result<String, String> {
-    if api_key.trim().is_empty() {
-        return Err("API key is required".into());
-    }
     match provider.as_str() {
-        "anthropic" => anthropic_chat(&api_key, &model, &system, &messages).await,
-        "openai" => openai_chat(&api_key, &model, &system, &messages).await,
+        "anthropic" => {
+            if api_key.trim().is_empty() {
+                return Err("API key is required".into());
+            }
+            anthropic_chat(&api_key, &model, &system, &messages).await
+        }
+        "openai" => {
+            if api_key.trim().is_empty() {
+                return Err("API key is required".into());
+            }
+            openai_compatible_chat(
+                &api_key,
+                &model,
+                &system,
+                &messages,
+                "https://api.openai.com/v1",
+            )
+            .await
+        }
+        "openai-compatible" => {
+            openai_compatible_chat(
+                &api_key,
+                &model,
+                &system,
+                &messages,
+                base_url.as_deref().unwrap_or(""),
+            )
+            .await
+        }
         _ => Err("Unknown AI provider".into()),
     }
 }

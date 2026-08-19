@@ -7,6 +7,7 @@ import Editor from '@/components/Editor';
 import ImageViewer from '@/components/ImageViewer';
 import BacklinksPanel from '@/components/BacklinksPanel';
 import QuickSwitcher from '@/components/QuickSwitcher';
+import VaultReplaceDialog from '@/components/VaultReplaceDialog';
 import CommandPalette, { type CommandItem } from '@/components/CommandPalette';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import TabBar from '@/components/TabBar';
@@ -70,6 +71,7 @@ export default function Home() {
   const [dirty, setDirty] = useState<Set<string>>(new Set());
   const [backlinksData, setBacklinksData] = useState<any>(null);
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [replaceOpen, setReplaceOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [aiChatOpen, setAiChatOpen] = useState(false);
   const [aiEditStates, setAiEditStates] = useState<Record<string, AiEditStatus>>({});
@@ -530,7 +532,9 @@ export default function Home() {
   const toggleFileView = useCallback(() => {
     if (!activePath || !isEditableInMonaco(activePath)) return;
     if (!supportsReadView(activePath)) return;
-    setMarkdownView(markdownViewMode === 'read' ? 'edit' : 'read');
+    const next =
+      markdownViewMode === 'edit' ? 'split' : markdownViewMode === 'split' ? 'read' : 'edit';
+    setMarkdownView(next);
   }, [activePath, markdownViewMode, setMarkdownView]);
 
   useShortcut('togglePreview', toggleFileView);
@@ -651,6 +655,7 @@ export default function Home() {
   const commands: CommandItem[] = useMemo(
     () => [
       { id: 'jump', label: 'Jump to note', group: 'Navigation', shortcut: formatChord(bindings.quickSwitcher), run: () => setSwitcherOpen(true) },
+      { id: 'replace', label: 'Find and replace in vault', group: 'Files', run: () => setReplaceOpen(true) },
       { id: 'ai', label: 'Toggle AI chat', group: 'Navigation', shortcut: formatChord(bindings.toggleAiChat), run: () => setAiChatOpen((o) => !o) },
       { id: 'settings', label: 'Open settings', group: 'Navigation', shortcut: formatChord(bindings.settings), run: () => setPanel('settings') },
       { id: 'new-file', label: 'New file', group: 'Files', shortcut: formatChord(bindings.newFile), run: () => setPendingCreate({ kind: 'file', parent: activePath ? parentDir(activePath) : '', nonce: Date.now() }) },
@@ -876,6 +881,30 @@ export default function Home() {
       </div>
 
       {switcherOpen && <QuickSwitcher allFiles={allFiles} onSelect={openFile} onClose={() => setSwitcherOpen(false)} />}
+      {replaceOpen && (
+        <VaultReplaceDialog
+          allFiles={allFiles}
+          onClose={() => setReplaceOpen(false)}
+          onApplied={async (paths) => {
+            setNotice(`Replaced in ${paths.length} file${paths.length === 1 ? '' : 's'}`);
+            await loadTree();
+            for (const path of paths) {
+              try {
+                const next = await vault.readFile(path);
+                setContents((c) => ({ ...c, [path]: next }));
+                setDirty((d) => {
+                  const n = new Set(d);
+                  n.delete(path);
+                  return n;
+                });
+              } catch {
+                /* ignore */
+              }
+            }
+            setEditorEpoch((e) => e + 1);
+          }}
+        />
+      )}
       {paletteOpen && <CommandPalette commands={commands} onClose={() => setPaletteOpen(false)} />}
 
       {closeConfirm && (

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { normalizeCompatibleBaseUrl } from '@/lib/ai/config';
 import { isOpenAiChatModel, type AiModelOption } from '@/lib/ai/models';
 
 type AnthropicModelsResponse = {
@@ -44,10 +45,14 @@ async function anthropicModels(apiKey: string): Promise<AiModelOption[]> {
   return models;
 }
 
-async function openaiModels(apiKey: string): Promise<AiModelOption[]> {
-  const res = await fetch('https://api.openai.com/v1/models', {
-    headers: { Authorization: `Bearer ${apiKey}` }
-  });
+async function openaiCompatibleModels(apiKey: string, baseUrl: string): Promise<AiModelOption[]> {
+  const root = normalizeCompatibleBaseUrl(baseUrl);
+  if (!root) throw new Error('Base URL is required');
+
+  const headers: Record<string, string> = {};
+  if (apiKey.trim()) headers.Authorization = `Bearer ${apiKey.trim()}`;
+
+  const res = await fetch(`${root}/models`, { headers });
   const data = (await res.json().catch(() => ({}))) as OpenAiModelsResponse & {
     error?: { message?: string };
   };
@@ -57,21 +62,29 @@ async function openaiModels(apiKey: string): Promise<AiModelOption[]> {
 
   return (data.data ?? [])
     .map((m) => m.id)
-    .filter(isOpenAiChatModel)
-    .sort((a, b) => b.localeCompare(a))
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
     .map((id) => ({ id, label: id }));
+}
+
+async function openaiModels(apiKey: string): Promise<AiModelOption[]> {
+  const models = await openaiCompatibleModels(apiKey, 'https://api.openai.com/v1');
+  return models
+    .filter((m) => isOpenAiChatModel(m.id))
+    .sort((a, b) => b.id.localeCompare(a.id));
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const provider = body?.provider as string;
-    const apiKey = body?.apiKey as string;
+    const apiKey = (body?.apiKey as string) ?? '';
+    const baseUrl = (body?.baseUrl as string) ?? '';
 
     if (!provider || provider === 'off') {
       return NextResponse.json({ error: 'AI provider not configured' }, { status: 400 });
     }
-    if (!apiKey?.trim()) {
+    if (provider !== 'openai-compatible' && !apiKey?.trim()) {
       return NextResponse.json({ error: 'API key is required' }, { status: 400 });
     }
 
@@ -80,7 +93,9 @@ export async function POST(req: NextRequest) {
         ? await anthropicModels(apiKey)
         : provider === 'openai'
           ? await openaiModels(apiKey)
-          : null;
+          : provider === 'openai-compatible'
+            ? await openaiCompatibleModels(apiKey, baseUrl)
+            : null;
 
     if (models === null) {
       return NextResponse.json({ error: 'Unknown provider' }, { status: 400 });

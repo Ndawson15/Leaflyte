@@ -1,15 +1,57 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 
-export const VAULT_DIR = process.env.VAULT_DIR
-  ? path.resolve(process.env.VAULT_DIR)
-  : path.join(process.cwd(), 'vault');
+const APP_CONFIG_DIR = 'com.leaflyte.desktop';
+
+function desktopConfigDir(): string {
+  const home = os.homedir();
+  if (process.platform === 'darwin') {
+    return path.join(home, 'Library', 'Application Support', APP_CONFIG_DIR);
+  }
+  if (process.platform === 'win32') {
+    return path.join(
+      process.env.APPDATA || path.join(home, 'AppData', 'Roaming'),
+      APP_CONFIG_DIR
+    );
+  }
+  return path.join(home, '.local', 'share', APP_CONFIG_DIR);
+}
+
+/** Same persisted path the Tauri desktop app uses (Application Support/com.leaflyte.desktop/vault-path.txt). */
+function loadPersistedVaultPath(): string | null {
+  try {
+    const raw = fs.readFileSync(path.join(desktopConfigDir(), 'vault-path.txt'), 'utf8').trim();
+    if (!raw) return null;
+    const resolved = path.resolve(raw);
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+      return resolved;
+    }
+  } catch {
+    // no persisted vault yet
+  }
+  return null;
+}
+
+/** Active vault root for Next.js API routes (capture, dev file APIs). */
+export function getVaultDir(): string {
+  if (process.env.VAULT_DIR) {
+    return path.resolve(process.env.VAULT_DIR);
+  }
+  const persisted = loadPersistedVaultPath();
+  if (persisted) return persisted;
+  return path.join(process.cwd(), 'vault');
+}
+
+/** @deprecated Prefer getVaultDir() — capture and file APIs resolve dynamically. */
+export const VAULT_DIR = getVaultDir();
 
 const IGNORE = new Set(['.git', 'node_modules', '.DS_Store', '.leaflyte-index']);
 
 function loadGitignore(): string[] {
+  const vaultDir = getVaultDir();
   try {
-    const raw = fs.readFileSync(path.join(VAULT_DIR, '.gitignore'), 'utf8');
+    const raw = fs.readFileSync(path.join(vaultDir, '.gitignore'), 'utf8');
     return raw
       .split('\n')
       .map((l) => l.trim())
@@ -41,19 +83,21 @@ export interface TreeNode {
   children?: TreeNode[];
 }
 
-/** Resolve a relative vault path safely, refusing to escape VAULT_DIR. */
+/** Resolve a relative vault path safely, refusing to escape the vault root. */
 export function resolveSafe(relPath: string): string {
+  const vaultDir = getVaultDir();
   const cleaned = relPath.replace(/^\/+/, '');
-  const abs = path.resolve(VAULT_DIR, cleaned);
-  if (abs !== VAULT_DIR && !abs.startsWith(VAULT_DIR + path.sep)) {
+  const abs = path.resolve(vaultDir, cleaned);
+  if (abs !== vaultDir && !abs.startsWith(vaultDir + path.sep)) {
     throw new Error('Path escapes vault directory');
   }
   return abs;
 }
 
 export function ensureVault() {
-  if (!fs.existsSync(VAULT_DIR)) {
-    fs.mkdirSync(VAULT_DIR, { recursive: true });
+  const vaultDir = getVaultDir();
+  if (!fs.existsSync(vaultDir)) {
+    fs.mkdirSync(vaultDir, { recursive: true });
   }
 }
 
@@ -61,23 +105,26 @@ function toPosix(p: string) {
   return p.split(path.sep).join('/');
 }
 
-export function listTree(dir: string = VAULT_DIR, gitignore: string[] = loadGitignore()): TreeNode[] {
+export function listTree(dir?: string, gitignore?: string[]): TreeNode[] {
+  const vaultDir = getVaultDir();
+  const root = dir ?? vaultDir;
+  const ignore = gitignore ?? loadGitignore();
   ensureVault();
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const entries = fs.readdirSync(root, { withFileTypes: true });
   const nodes: TreeNode[] = [];
 
   for (const entry of entries) {
     if (IGNORE.has(entry.name) || entry.name.startsWith('.')) continue;
-    const abs = path.join(dir, entry.name);
-    const rel = toPosix(path.relative(VAULT_DIR, abs));
-    if (isGitignored(rel, gitignore)) continue;
+    const abs = path.join(root, entry.name);
+    const rel = toPosix(path.relative(vaultDir, abs));
+    if (isGitignored(rel, ignore)) continue;
 
     if (entry.isDirectory()) {
       nodes.push({
         name: entry.name,
         path: rel,
         type: 'folder',
-        children: listTree(abs, gitignore)
+        children: listTree(abs, ignore)
       });
     } else {
       nodes.push({ name: entry.name, path: rel, type: 'file' });
@@ -154,14 +201,16 @@ export function movePath(fromRel: string, toRel: string) {
 }
 
 /** Flat list of every file (not folders) in the vault, relative posix paths. */
-export function listAllFiles(dir: string = VAULT_DIR): string[] {
+export function listAllFiles(dir?: string): string[] {
+  const vaultDir = getVaultDir();
+  const root = dir ?? vaultDir;
   const gitignore = loadGitignore();
   const out: string[] = [];
   const walk = (d: string) => {
     for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
       if (IGNORE.has(entry.name) || entry.name.startsWith('.')) continue;
       const abs = path.join(d, entry.name);
-      const rel = toPosix(path.relative(VAULT_DIR, abs));
+      const rel = toPosix(path.relative(vaultDir, abs));
       if (isGitignored(rel, gitignore)) continue;
       if (entry.isDirectory()) {
         walk(abs);
@@ -171,6 +220,6 @@ export function listAllFiles(dir: string = VAULT_DIR): string[] {
     }
   };
   ensureVault();
-  walk(dir);
+  walk(root);
   return out;
 }

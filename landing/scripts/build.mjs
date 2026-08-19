@@ -1,19 +1,32 @@
 import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 const landingRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-
-// Hostinger output directory is relative to the app root (landing/), not repo root.
 const out = join(landingRoot, 'build');
 
-const staticPaths = ['index.html', 'styles.css', 'assets', 'downloads', 'updates'];
+const staticPaths = ['downloads', 'updates'];
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
+console.log('Building React landing with Vite…');
+const vite = spawnSync('npx', ['vite', 'build'], {
+  cwd: landingRoot,
+  stdio: 'inherit',
+  shell: true,
+});
+
+if (vite.status !== 0) {
+  console.error('Vite build failed');
+  process.exit(vite.status || 1);
+}
+
 for (const path of staticPaths) {
-  cpSync(join(landingRoot, path), join(out, path), { recursive: true });
+  const source = join(landingRoot, path);
+  if (!existsSync(source)) continue;
+  cpSync(source, join(out, path), { recursive: true });
 }
 
 if (!existsSync(join(out, 'index.html'))) {
