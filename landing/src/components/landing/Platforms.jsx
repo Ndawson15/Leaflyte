@@ -5,7 +5,7 @@ import styles from './Platforms.module.css';
 
 var PLATFORMS = [
   { name: 'macOS', label: 'Native desktop', href: 'downloads/Leaflyte.dmg' },
-  { name: 'Windows', label: 'Desktop app (ARM64)', href: 'downloads/Leaflyte-setup.exe' },
+  { name: 'Windows', label: 'Desktop app', href: 'downloads/Leaflyte-setup.exe' },
   { name: 'Linux', label: 'AppImage & .deb', href: '#get-started' },
 ];
 

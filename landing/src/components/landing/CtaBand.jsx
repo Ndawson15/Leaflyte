@@ -42,7 +42,7 @@ function CtaBand() {
             whileTap={{ scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 420, damping: 22 }}
           >
-            Download for Windows (ARM64)
+            Download for Windows
           </motion.a>
         </div>
       </motion.div>

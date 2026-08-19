@@ -56,7 +56,7 @@ After `npm run tauri:build` (from repo root), copy installers into `landing/down
 | Platform | Source |
 |----------|--------|
 | macOS | `src-tauri/target/release/bundle/dmg/*.dmg` → `landing/downloads/Leaflyte.dmg` |
-| Windows | `dist-windows/*-setup.exe` → `landing/downloads/Leaflyte-setup.exe` (also `.msi`, portable `leaflyte.exe` → `Leaflyte-portable.exe`) |
+| Windows | `dist-windows/Leaflyte_*_x64-setup.exe` → `Leaflyte-setup.exe` (also `*_x64_en-US.msi` → `Leaflyte-setup.msi`, `leaflyte-x64.exe` → `Leaflyte-portable.exe`) |
 | Linux | `src-tauri/target/release/bundle/appimage/*.AppImage` → `landing/downloads/Leaflyte.AppImage` |
 | Linux | `src-tauri/target/release/bundle/deb/*.deb` → `landing/downloads/Leaflyte.deb` |
 
