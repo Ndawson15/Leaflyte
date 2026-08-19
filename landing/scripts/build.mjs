@@ -25,6 +25,19 @@ if (vite.status !== 0) {
 
 console.log('Building documentation site…');
 const docsRoot = join(landingRoot, 'docs');
+
+console.log('Installing documentation dependencies…');
+const docsInstall = spawnSync('npm', ['ci'], {
+  cwd: docsRoot,
+  stdio: 'inherit',
+  shell: true,
+});
+
+if (docsInstall.status !== 0) {
+  console.error('Docs dependency install failed');
+  process.exit(docsInstall.status || 1);
+}
+
 const docsBuild = spawnSync('npm', ['run', 'build'], {
   cwd: docsRoot,
   stdio: 'inherit',
