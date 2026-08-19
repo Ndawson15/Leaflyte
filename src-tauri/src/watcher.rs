@@ -42,7 +42,7 @@ pub fn start(app: AppHandle) {
 
         let mut watched: Option<std::path::PathBuf> = None;
         loop {
-            if let Some(state) = app.try_state::<VaultState>() {
+            if let Some(state) = app.try_state::<Arc<VaultState>>() {
                 if let Ok(root) = state.root.lock() {
                     if watched.as_ref() != Some(&*root) {
                         if let Some(prev) = watched.take() {

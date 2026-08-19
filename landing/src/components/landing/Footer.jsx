@@ -4,6 +4,7 @@ import { fadeUp, useReducedMotion, viewportOnce } from '../../utils/motion';
 import styles from './Footer.module.css';
 
 var PRODUCT_LINKS = [
+  { label: 'Documentation', href: '/docs/' },
   { label: 'Features', href: '#features' },
   { label: 'How it works', href: '#how-it-works' },
   { label: 'Downloads', href: '#get-started' },

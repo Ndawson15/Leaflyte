@@ -1,0 +1,43 @@
+---
+title: Themes
+description: Built-in editor themes and custom color overrides in Leaflyte.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte ships four editor themes that sync Monaco and the app chrome. Override individual colors for a personalized palette.
+
+## Built-in themes
+
+| Theme | Character |
+|-------|-----------|
+| **Carbon** | Dark neutral default |
+| **Midnight** | Deep blue-black |
+| **Paper** | Warm light |
+| **Sepia** | Low-glare light |
+
+Switch in **Settings → Theme** or via the theme picker if exposed in the UI chrome.
+
+## Custom colors
+
+**Settings → Theme → Customize** exposes eight CSS variables:
+
+- Background, surface, surface accent
+- Border, text, muted text
+- Amber accent, teal accent
+
+Changes apply to Monaco via a generated `leaflyte-custom` theme.
+
+## File icons
+
+Toggle **color file icons** (VS Code–style) in theme settings for richer sidebar recognition.
+
+## Markdown view mode
+
+Theme settings remember your preferred **edit / split / read** mode per session. Cycle with `Cmd+Shift+E`.
+
+## Persistence
+
+Themes store in localStorage — per browser profile on web, per app install on desktop.

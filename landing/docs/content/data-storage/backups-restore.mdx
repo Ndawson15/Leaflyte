@@ -1,0 +1,53 @@
+---
+title: Backups & Restore
+description: Backup strategies for Leaflyte vaults — git, snapshots, and rsync.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Because Leaflyte stores everything as files, standard backup tools work without export wizards.
+
+## Recommended approaches
+
+### Git (developers)
+
+```bash
+cd /path/to/vault
+git init
+git add .
+git commit -m "Vault snapshot"
+```
+
+Add a `.gitignore` for `.leaflyte-index` if present.
+
+### Restic / Borg / Time Machine
+
+Point your backup tool at the vault directory. Leaflyte's autosave (1.5s debounce) means files change frequently — schedule backups during low-activity windows or use continuous backup agents.
+
+### NAS snapshots
+
+ZFS, Btrfs, or Unraid array snapshots capture point-in-time copies with minimal overhead.
+
+## Desktop vault locations
+
+| Platform | Default packaged path |
+|----------|----------------------|
+| macOS | `~/Documents/Leaflyte` |
+| Windows | `Documents\Leaflyte` |
+| Linux | `~/Documents/Leaflyte` |
+
+Dev builds use `./vault` in the repo.
+
+## Restore
+
+1. Stop Leaflyte (avoid writes mid-restore)
+2. Replace vault folder contents from backup
+3. Relaunch — index rebuilds automatically
+
+## What to exclude
+
+- `node_modules` if accidentally inside vault
+- Large build artifacts you do not need in notes
+- Ephemeral `.leaflyte-index` (optional — regenerates)

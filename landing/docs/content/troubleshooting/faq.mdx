@@ -1,0 +1,42 @@
+---
+title: FAQ
+description: Frequently asked questions about Leaflyte — pricing, sync, platforms, and privacy.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Quick answers to common questions. For setup help, start with [Quick Start](/getting-started/quick-start/).
+
+## Is Leaflyte free?
+
+The app is open source. You host your own data — no subscription for local/desktop use.
+
+## Does Leaflyte sync between devices?
+
+Not yet. Desktop uses local folders only. Sync via git, Syncthing, or iCloud/Dropbox on the vault folder is possible today; native sync is on the [roadmap](/changelog/).
+
+## macOS / Windows / Linux?
+
+Yes — desktop builds for all three via Tauri. Download from [leaflyte.app](https://leaflyte.app).
+
+## Is my data sent to the cloud?
+
+No — notes stay on disk. AI features send prompts only to providers **you** configure (Ollama locally, or your own API keys).
+
+## Obsidian compatibility?
+
+Mostly yes for `.md` files, `[[wikilinks]]`, `#tags`, and `![[embeds]]`. Obsidian plugin metadata in `.obsidian/` is ignored.
+
+## Can I use SQL / code files as notes?
+
+Yes — that's the core idea. Monaco opens 100+ language modes; CFML has a custom grammar.
+
+## Why port 1420?
+
+Tauri's dev config binds Next.js to 1420 so the desktop webview and VS Code capture share one origin.
+
+## How do I report bugs?
+
+[GitHub Issues](https://github.com/Ndawson15/Leaflyte/issues) on the main repository.

@@ -1,0 +1,58 @@
+---
+title: Common Errors
+description: Fix frequent Leaflyte issues — vault path, Monaco, capture, and build errors.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Most issues trace to vault path, dev server not running, or platform-specific build prerequisites.
+
+## Cannot read vault / empty sidebar
+
+**Cause:** Vault path wrong or permissions denied.
+
+**Fix:**
+1. Check `VAULT_DIR` in `.env.local` (web) or **Settings → Workspaces** (desktop)
+2. Ensure the directory exists and is readable
+3. Desktop: verify `vault-path.txt` in app support folder
+
+## Monaco 404 / blank editor (dev)
+
+**Cause:** Next.js dev + `standalone` output conflict, or chunk load failure.
+
+**Fix:**
+1. Stop dev server, delete `.next`, restart `npm run dev`
+2. Do not set `output: 'standalone'` during local Tauri dev
+3. Hard refresh browser (`Cmd+Shift+R`)
+
+## Capture extension cannot connect
+
+**Cause:** Leaflyte not running or wrong URL.
+
+**Fix:**
+1. Run `npm run dev` or `npm run tauri:dev`
+2. Extension default: `http://127.0.0.1:1420/api/capture`
+3. For LAN: `npm run dev:lan` + update `leaflyte.captureUrl` in VS Code settings
+
+## Captures succeed but files missing in UI
+
+**Cause:** API vault path differs from open workspace.
+
+**Fix:** Align `VAULT_DIR` with the workspace folder shown in Settings.
+
+## Tauri build fails
+
+**Cause:** Missing Rust or platform webview dependencies.
+
+**Fix:** Follow [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your OS. Windows builds require WebView2 (preinstalled on Win 10/11).
+
+## AI request failed
+
+**Cause:** Provider down, wrong URL, or SSRF guard blocked internal URL.
+
+**Fix:**
+1. Verify Ollama at `http://localhost:11434/v1`
+2. Check Settings → AI base URL and model name
+3. Review browser console and terminal logs

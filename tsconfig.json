@@ -38,6 +38,8 @@
   "exclude": [
     "node_modules",
     "vault",
-    "src-tauri"
+    "src-tauri",
+    "landing",
+    "extensions"
   ]
 }

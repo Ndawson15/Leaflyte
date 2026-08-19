@@ -1,0 +1,41 @@
+---
+title: Rate Limits
+description: Rate limiting behavior for Leaflyte APIs and AI proxy routes.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte does **not** implement application-level rate limits in v0.2.x. Limits come from upstream providers and infrastructure.
+
+## AI routes
+
+| Layer | Limiting |
+|-------|----------|
+| Leaflyte | None built-in |
+| Ollama / LM Studio | Hardware throughput |
+| OpenAI / Anthropic | Provider quota and TPM/RPM |
+
+Configure reasonable timeouts in your reverse proxy for `/api/ai/*` (e.g. 120s for long completions).
+
+## File APIs
+
+Vault read/write endpoints are bounded by disk I/O. Automated scripts should serialize bulk imports — thousands of rapid POSTs may contend with autosave.
+
+## Recommended proxy limits
+
+For public-ish deployments, add nginx `limit_req`:
+
+```nginx
+limit_req_zone $binary_remote_addr zone=api:10m rate=30r/m;
+
+location /api/ {
+  limit_req zone=api burst=20 nodelay;
+  proxy_pass http://127.0.0.1:4000;
+}
+```
+
+## Future
+
+Multi-tenant self-hosted sync will document per-user quotas here.

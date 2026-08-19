@@ -1,0 +1,59 @@
+---
+title: Self-Hosting Requirements
+description: Hardware, software, and network requirements for running Leaflyte as a local web service.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte's **primary** distribution is the desktop app. Self-hosting means running the Next.js UI against a vault directory on a server you control — useful for always-on access on a home lab or NAS, typically behind a reverse proxy with authentication.
+
+<Callout variant="warning">
+Official Docker images and in-app sync are not released yet. Self-hosting today means building from source or containerizing the Next.js app yourself. See [Deployment](/deployment/docker/) for patterns.
+</Callout>
+
+## Minimum requirements
+
+| Resource | Recommendation |
+|----------|----------------|
+| **CPU** | 1 vCPU (2+ for AI proxy workloads) |
+| **RAM** | 512 MB idle; 1 GB+ with large vaults |
+| **Storage** | Vault size + 500 MB for Node/build artifacts |
+| **OS** | Linux (recommended), macOS, or Windows with Node 20+ |
+
+## Software dependencies
+
+- **Node.js** 20.x or 22.x
+- **npm** (ships with Node)
+- Optional: **Rust toolchain** only if you build the Tauri desktop app on the same machine
+
+## Network
+
+| Port | Purpose |
+|------|---------|
+| **1420** | Default dev server (`npm run dev`) |
+| **4000** | Production `next start` (see `package.json`) |
+
+<Callout variant="note">
+The dev server binds to `127.0.0.1` by default. Use `npm run dev:lan` to bind `0.0.0.0` — only on networks you trust, or place authentication in front via [Reverse Proxy / SSL](/deployment/reverse-proxy-ssl/).
+</Callout>
+
+## Vault storage
+
+- Use a **persistent volume** or bind mount for the vault path
+- Set `VAULT_DIR` to an absolute path (see [Environment Variables](/deployment/environment-variables/))
+- Leaflyte ignores `.git`, `node_modules`, dotfiles, and paths matched by `.gitignore`
+
+## Security checklist
+
+1. Do **not** expose port 1420/4000 to the public internet without auth
+2. Terminate TLS at Caddy, nginx, or Traefik
+3. AI API keys stay in **browser localStorage** — never in server env vars
+4. Run the process as a non-root user with write access only to the vault directory
+
+## Related
+
+- [Docker](/deployment/docker/) — Container deployment patterns
+- [Authentication](/accounts-access/authentication/) — Securing a self-hosted instance
+- [Backups & Restore](/data-storage/backups-restore/) — Protecting vault data

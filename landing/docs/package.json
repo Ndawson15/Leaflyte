@@ -1,0 +1,35 @@
+{
+  "name": "leaflyte-docs",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Leaflyte documentation — leaflyte.app/docs",
+  "scripts": {
+    "prebuild": "node scripts/generate-search-index.mjs",
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001"
+  },
+  "dependencies": {
+    "fuse.js": "^7.1.0",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^1.31.0",
+    "next": "^16.3.1",
+    "next-mdx-remote": "^5.0.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "rehype-pretty-code": "^0.14.1",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^1.29.2"
+  },
+  "devDependencies": {
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^20.14.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^7.0.2"
+  }
+}

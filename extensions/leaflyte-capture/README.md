@@ -4,18 +4,11 @@ Send the current selection (or whole file) into your Leaflyte vault as a **real 
 
 ## Setup
 
-1. **Start Leaflyte** and open the vault you want to capture into (`npm run tauri:dev` or the desktop app).
-2. From this folder:
+1. **Install and open Leaflyte** — Download from [leaflyte.app](https://leaflyte.app) or run `npm run tauri:dev` during development. Open the vault you want to capture into.
+2. **Install the extension** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Leaflyte.leaflyte-capture) (or press F5 from this folder for local dev).
+3. **Connect** — The status bar shows your vault when Leaflyte is running. Click it or run **Leaflyte: Connect to Vault** after switching workspaces.
 
-```bash
-cd extensions/leaflyte-capture
-npm install
-npm run compile
-```
-
-3. Press **F5** in this folder to open an Extension Development Host (or install from VSIX).
-
-The extension calls `GET /api/vault` on Leaflyte to discover whichever vault folder is currently open, then writes captures there via `POST /api/capture`. A status bar item shows the connected vault — click it or run **Leaflyte: Connect to Vault** to refresh after switching workspaces.
+The extension calls `GET /api/vault` to discover the active vault, then `POST /api/capture` to write files. **Production desktop builds** expose this API on `http://127.0.0.1:1420` automatically while the app is open — no `npm run dev` required.
 
 ## Commands
 

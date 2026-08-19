@@ -1,0 +1,38 @@
+---
+title: Attachments
+description: Images, PDFs, and file embeds stored alongside notes in your vault.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Attachments are ordinary files in your vault — not uploaded to a cloud service. Drop images into a folder or reference them from markdown.
+
+## Images
+
+Supported viewers: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`, `.ico`
+
+- **Markdown**: `![alt](./assets/diagram.png)`
+- **Image-only tab**: Opens the image viewer instead of Monaco
+- **Web dev**: Served via `GET /api/asset?path=`
+
+## File embeds
+
+Embed another vault file inside markdown:
+
+```markdown
+![[notes/spec.pdf]]
+![[src/example.ts]]
+![[diagram.png|height=400]]
+```
+
+Embeds render inline in preview with appropriate viewers (code, image, etc.).
+
+## Binary files
+
+PDFs, archives, and fonts are indexed lightly — search skips binary content but paths remain discoverable via quick switcher.
+
+## VS Code capture
+
+The capture extension saves selections as new files (default folder `captures/`) with the correct extension and language mode. See [Quick Start](/getting-started/quick-start/#connect-vs-code-capture).

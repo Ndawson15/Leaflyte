@@ -1,0 +1,33 @@
+---
+title: Unraid
+description: Deploy Leaflyte on Unraid using Docker Compose and a persistent vault share.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Run Leaflyte on Unraid by building the Docker image on your server (or pulling from a registry you maintain) and mapping a share to `/vault`.
+
+## Steps
+
+1. **Create a share** — e.g. `/mnt/user/appdata/leaflyte/vault` for note storage.
+
+2. **Add a Docker Compose stack** in Unraid (Compose Plugin) using the file from [Docker Compose Reference](/deployment/docker-compose-reference/).
+
+3. **Set environment** — `VAULT_DIR=/vault` and map the share:
+
+```yaml
+volumes:
+  - /mnt/user/appdata/leaflyte/vault:/vault
+```
+
+4. **Publish port** `4000:4000` (or route through nginx Proxy Manager on 443).
+
+5. **Add authentication** — Leaflyte has no built-in login for web mode. Put Authelia, Authentik, or NPM access lists in front. See [Authentication](/accounts-access/authentication/).
+
+## Tips
+
+- Pin a specific image tag instead of `:latest` when you maintain your own builds
+- Schedule [Backups & Restore](/data-storage/backups-restore/) of the vault share with Unraid CA Backup or rsync
+- Use Tailscale on Unraid for remote access without opening ports publicly

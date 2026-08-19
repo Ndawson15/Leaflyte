@@ -1,0 +1,41 @@
+---
+title: Migrations
+description: Move vaults between machines and upgrade Leaflyte versions safely.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Vault migration is file copy. App migration is installer upgrade + optional index rebuild.
+
+## Move vault to a new machine
+
+1. **Copy** the entire vault folder (rsync, USB, cloud sync)
+2. **Install** Leaflyte on the new machine
+3. **Select** the copied folder as your vault on first launch, or add via **Settings → Workspaces**
+
+## Change vault path (desktop)
+
+Use **Settings → Workspaces** to add the new path and remove the old workspace entry. Files are not moved automatically — copy them first if needed.
+
+## Upgrade Leaflyte version
+
+### Desktop
+
+1. Download the new installer from [leaflyte.app](https://leaflyte.app) or wait for the in-app updater
+2. Install over the previous version
+3. Launch — vault path persists in app data
+
+### Self-hosted web
+
+1. Pull latest `main` from GitHub
+2. `npm ci && npm run build`
+3. Restart `next start` or recreate the container
+4. Vault bind mount is unchanged
+
+See [Upgrading Versions](/troubleshooting/upgrading-versions/) for troubleshooting.
+
+## Schema migrations
+
+There is no vault schema version file. Leaflyte reads plain files — backward compatibility is maintained by keeping notes as standard formats (markdown, text, code).

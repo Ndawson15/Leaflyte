@@ -1,0 +1,45 @@
+---
+title: Permissions
+description: File-system permissions and future role-based access in Leaflyte.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte inherits **OS file permissions** for the vault directory. There is no in-app permission matrix in v0.2.x.
+
+## Desktop
+
+The app runs as your user account. Any process with filesystem access to the vault folder can read/write notes.
+
+## Self-hosted
+
+Run the Node process as a dedicated user:
+
+```bash
+useradd -r leaflyte
+chown -R leaflyte:leaflyte /data/leaflyte/vault
+```
+
+Only mount the vault volume into the container — not Docker socket or host root.
+
+## Shared team rules (informal)
+
+Until RBAC exists:
+
+- Use separate folders per person or project
+- Use git for audit trail (`git log` on the vault)
+- Restrict proxy auth to known users
+
+## Planned RBAC
+
+Future releases may add:
+
+| Role | Capabilities (planned) |
+|------|------------------------|
+| **Viewer** | Read-only vault access |
+| **Editor** | Create/edit/delete own folders |
+| **Admin** | Manage users and settings |
+
+See [Multi-user Setup](/accounts-access/multi-user-setup/).

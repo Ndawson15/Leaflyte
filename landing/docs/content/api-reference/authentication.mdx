@@ -1,0 +1,32 @@
+---
+title: Authentication
+description: Security model for Leaflyte HTTP APIs — open on localhost, protect on LAN/WAN.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte API routes have **no API keys or JWT** in v0.2.x. They trust the network they bind to.
+
+| Context | Security model |
+|---------|----------------|
+| `npm run dev` on `127.0.0.1` | Localhost only — safe default |
+| `npm run dev:lan` | Any device on LAN can call APIs — use firewall rules |
+| Behind reverse proxy | Auth enforced by proxy |
+
+## Capture API
+
+The VS Code extension POSTs to `/api/capture`. Restrict who can reach port **1420** on shared networks.
+
+## AI proxy routes
+
+`/api/ai/chat` and `/api/ai/models` forward requests using keys from the **browser session** (request body / client config), not server env.
+
+## SSRF protection
+
+Local/OpenAI-compatible URLs are validated before server-side fetch to block internal network probing. See `lib/ai/urlSafety.ts` in the repo.
+
+## Future
+
+Self-hosted sync may introduce bearer tokens for multi-user instances. Desktop Tauri builds will continue using Rust invoke instead of HTTP for file operations.

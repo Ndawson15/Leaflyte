@@ -1,0 +1,44 @@
+---
+title: Search
+description: Quick switcher, query filters, regex search, and vault-wide find-and-replace.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte search is built into the **Quick Switcher** (`Cmd+K` / `Ctrl+K`) and a dedicated **Find and replace in vault** command. Search scans filenames and file contents across the active vault.
+
+## Quick switcher
+
+Press `Cmd+K` to fuzzy-jump to any file. Type to filter — scoring considers filename, path, content snippets, and tags.
+
+## Query filters
+
+| Filter | Example | Matches |
+|--------|---------|---------|
+| Extension | `ext:md` or `ext:ts,sql` | Files by extension |
+| Path | `path:runbooks/` | Files under a folder |
+| Regex | `/TODO|FIXME/i` | Case-insensitive regex in content |
+| Regex alt | `re:pattern` | Same as above |
+
+Combine filters with free text: `ext:md deploy path:docs/`
+
+## Find and replace
+
+1. Open the **Command palette** (`Cmd+Shift+P`)
+2. Run **Find and replace in vault**
+3. Enter search and replacement strings
+4. Review **per-file previews** before confirming writes
+
+<Callout variant="warning">
+Replace operations modify files on disk immediately after confirmation. Commit or back up your vault first if using git.
+</Callout>
+
+## API search
+
+Web dev exposes `GET /api/search?q=` for simple content search. Desktop builds search via Rust without HTTP.
+
+## Future: FTS5
+
+Very large vaults may eventually use SQLite FTS5 indexing. Today search is an in-process vault scan — fast for typical personal vaults, slower beyond tens of thousands of files.

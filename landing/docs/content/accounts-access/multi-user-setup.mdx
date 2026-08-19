@@ -1,0 +1,40 @@
+---
+title: Multi-user Setup
+description: Share a self-hosted Leaflyte instance with multiple people using proxy auth and vault layout patterns.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Native per-user accounts are **not shipped yet**. Today, multiple people can share one self-hosted instance if you accept a **shared vault** with proxy-level identity, or run **separate instances** per user.
+
+## Pattern A — Shared vault (simple)
+
+1. Deploy one Leaflyte container with one `VAULT_DIR`
+2. Put Authelia/Authentik in front — all authenticated users see the same notes
+3. Use folder conventions: `people/alice/`, `people/bob/`
+
+**Pros:** One deployment. **Cons:** No fine-grained ACLs inside Leaflyte.
+
+## Pattern B — Instance per user
+
+1. Run separate containers with different ports or subdomains
+2. Map unique vault volumes: `/vault/alice`, `/vault/bob`
+3. Auth rules route `alice.notes.example.com` → alice container
+
+**Pros:** Hard isolation. **Cons:** More ops overhead.
+
+## Pattern C — Desktop only (recommended today)
+
+Each user runs the **desktop app** with their own local vault. Sync files via Syncthing, git, or NAS — Leaflyte does not coordinate sync yet.
+
+## Future
+
+When multi-user ships, expect:
+
+- User records in a database (sync metadata only)
+- Note bodies remain files
+- Role-based folder permissions
+
+Track progress in [Changelog](/changelog/).

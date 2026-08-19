@@ -1,0 +1,60 @@
+---
+title: Endpoints
+description: HTTP API routes available in Leaflyte web/dev mode.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+These routes exist when running `npm run dev` or `next start`. **Desktop Tauri** uses Rust commands instead — APIs are not required at runtime.
+
+Base URL: `http://127.0.0.1:1420` (dev) or your deployment origin.
+
+## Vault & files
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/tree` | Vault directory tree |
+| GET | `/api/file?path=` | Read file contents |
+| POST | `/api/file` | Write/create file |
+| DELETE | `/api/file?path=` | Delete file |
+| PATCH | `/api/file` | Move/rename file |
+| GET | `/api/asset?path=` | Serve binary/image assets |
+
+## Search & links
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/search?q=` | Content search |
+| GET | `/api/backlinks?path=` | Tags, backlinks, outgoing links |
+
+## Capture
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/capture` | Health check |
+| POST | `/api/capture` | Create capture file from editor |
+
+### POST /api/capture body
+
+```json
+{
+  "content": "const hello = 'world';",
+  "languageId": "typescript",
+  "title": "example",
+  "folder": "captures",
+  "extension": "ts"
+}
+```
+
+## AI
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/ai/chat` | Chat completion proxy |
+| POST | `/api/ai/models` | List models from provider |
+
+<Callout variant="note">
+The VS Code extension expects `GET /api/vault` for vault discovery — ensure your deployment version includes this route if using capture connect.
+</Callout>

@@ -1,0 +1,75 @@
+---
+title: Docker
+description: Run Leaflyte as a containerized Next.js service with a persistent vault volume.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte does not ship an official Docker image yet. This guide shows how to containerize the Next.js app from source so you can run it on a home server, NAS, or cloud VM with a bind-mounted vault.
+
+<Callout variant="note">
+For daily use, the **desktop app** is the recommended experience. Docker is for operators who want a browser-accessible instance on their network.
+</Callout>
+
+## Prerequisites
+
+- Docker Engine 24+ or Docker Desktop
+- Git clone of the [Leaflyte repository](https://github.com/Ndawson15/Leaflyte)
+- Host directory for vault data (e.g. `/data/leaflyte/vault`)
+
+## Dockerfile example
+
+Create `Dockerfile` in the repo root:
+
+```dockerfile
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV VAULT_DIR=/vault
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+EXPOSE 4000
+CMD ["node", "server.js"]
+```
+
+<Callout variant="warning">
+You may need to enable `output: 'standalone'` in `next.config.mjs` for container builds. The default Tauri build uses static export instead.
+</Callout>
+
+## Run the container
+
+1. **Create a vault directory** on the host:
+
+```bash
+mkdir -p /data/leaflyte/vault
+```
+
+2. **Build and start**:
+
+```bash
+docker build -t leaflyte .
+docker run -d \
+  --name leaflyte \
+  -p 4000:4000 \
+  -v /data/leaflyte/vault:/vault \
+  -e VAULT_DIR=/vault \
+  leaflyte
+```
+
+3. **Open** `http://localhost:4000` on the host (or your reverse-proxy URL).
+
+## Next steps
+
+- [Docker Compose Reference](/deployment/docker-compose-reference/) — Production Compose file
+- [Unraid](/deployment/unraid/) — Template for Unraid users
+- [Reverse Proxy / SSL](/deployment/reverse-proxy-ssl/) — HTTPS and auth

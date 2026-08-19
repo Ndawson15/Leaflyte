@@ -1,0 +1,78 @@
+---
+title: Docker Compose Reference
+description: Complete Docker Compose configuration for a self-hosted Leaflyte instance.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Reference Compose file for running Leaflyte with a persistent vault, restart policy, and optional health check.
+
+## Basic stack
+
+```yaml
+services:
+  leaflyte:
+    build: .
+    image: leaflyte:local
+    container_name: leaflyte
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      VAULT_DIR: /vault
+    volumes:
+      - ./vault:/vault
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+```
+
+## With reverse proxy (Caddy sidecar)
+
+```yaml
+services:
+  leaflyte:
+    build: .
+    restart: unless-stopped
+    environment:
+      VAULT_DIR: /vault
+    volumes:
+      - ./vault:/vault
+    expose:
+      - "4000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    depends_on:
+      - leaflyte
+
+volumes:
+  caddy_data:
+```
+
+See [Reverse Proxy / SSL Setup](/deployment/reverse-proxy-ssl/) for Caddyfile examples.
+
+## Resource limits (optional)
+
+```yaml
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+```
+
+## Environment reference
+
+All supported variables are listed in [Environment Variables](/deployment/environment-variables/).

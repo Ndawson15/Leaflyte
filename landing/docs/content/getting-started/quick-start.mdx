@@ -1,0 +1,72 @@
+---
+title: Quick Start
+description: Download Leaflyte, create your first vault, and start writing notes in under five minutes.
+category: Tutorial
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+This guide walks you through installing Leaflyte, choosing a vault folder, and creating your first note. No account or cloud setup required.
+
+## Install Leaflyte
+
+1. **Download the installer** — Go to [leaflyte.app](https://leaflyte.app) and download the build for macOS (.dmg), Windows (.exe), or Linux (.AppImage / .deb).
+
+2. **Open the app** — Launch Leaflyte from Applications or your Start menu.
+
+3. **Choose a vault folder** — On first launch, select an empty folder or an existing notes directory. Everything Leaflyte creates is a plain file inside this folder.
+
+<Callout variant="tip">
+Already have markdown notes? Point Leaflyte at that folder — there is no import wizard. Your files appear in the sidebar immediately.
+</Callout>
+
+## Create your first note
+
+1. **Create a note** — Press `Cmd+N` (macOS) or `Ctrl+N` (Windows/Linux), or use the sidebar **New file** action.
+
+2. **Write content** — Type markdown, code, or any supported file type. Use `[[wikilinks]]` to connect ideas.
+
+3. **Preview markdown** — Open a `.md` file and press `Cmd+Shift+E` to cycle **edit → split → read** view.
+
+```markdown
+# Daily standup
+
+- [ ] Review PRs
+- [x] Ship docs update
+
+Related: [[projects/leaflyte/roadmap]]
+```
+
+## Optional — run from source
+
+Developers can run Leaflyte locally without installing the desktop build:
+
+```bash
+git clone https://github.com/Ndawson15/Leaflyte.git
+cd Leaflyte
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:1420`. Notes are stored in `./vault`.
+
+For the desktop shell during development:
+
+```bash
+npm run tauri:dev
+```
+
+## Connect VS Code capture
+
+1. **Install** the [Leaflyte Capture](https://marketplace.visualstudio.com/items?itemName=Leaflyte.leaflyte-capture) extension.
+
+2. **Start Leaflyte** with `npm run dev` or `npm run tauri:dev` so the capture API is available on port **1420**.
+
+3. **Capture a selection** — Highlight code and press `Cmd+Shift+L`. A new file appears in your vault's `captures/` folder.
+
+## Next steps
+
+- [Creating & Organizing Notes](/core-features/creating-organizing-notes/) — Folders, wikilinks, workspaces
+- [Markdown Support](/core-features/markdown-support/) — GFM, Mermaid, task lists
+- [Themes](/customization/themes/) — Carbon, Midnight, Paper, Sepia

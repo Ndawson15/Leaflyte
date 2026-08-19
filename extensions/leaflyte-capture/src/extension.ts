@@ -1,5 +1,7 @@
-import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
 type LinkedVault = {
   vaultPath: string;
@@ -8,6 +10,42 @@ type LinkedVault = {
 
 let linkedVault: LinkedVault | null = null;
 let statusBar: vscode.StatusBarItem | undefined;
+
+const APP_CONFIG_DIR = 'com.leaflyte.desktop';
+const TOKEN_FILE = 'capture-token.txt';
+
+function desktopConfigDir(): string {
+  const home = os.homedir();
+  if (process.platform === 'darwin') {
+    return path.join(home, 'Library', 'Application Support', APP_CONFIG_DIR);
+  }
+  if (process.platform === 'win32') {
+    return path.join(
+      process.env.APPDATA || path.join(home, 'AppData', 'Roaming'),
+      APP_CONFIG_DIR
+    );
+  }
+  return path.join(home, '.local', 'share', APP_CONFIG_DIR);
+}
+
+function readCaptureToken(): string | null {
+  const configured = vscode.workspace.getConfiguration('leaflyte').get<string>('captureToken');
+  if (configured?.trim()) return configured.trim();
+
+  try {
+    const token = fs.readFileSync(path.join(desktopConfigDir(), TOKEN_FILE), 'utf8').trim();
+    return token || null;
+  } catch {
+    return null;
+  }
+}
+
+function captureHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const token = readCaptureToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
 
 function getConfig() {
   const config = vscode.workspace.getConfiguration('leaflyte');
@@ -44,8 +82,20 @@ function updateStatusBar(vault: LinkedVault | null) {
 
 async function refreshLinkedVault(silent = false): Promise<LinkedVault | null> {
   const { vaultUrl, captureUrl } = getConfig();
+
+  if (!readCaptureToken()) {
+    linkedVault = null;
+    updateStatusBar(null);
+    if (!silent) {
+      vscode.window.showErrorMessage(
+        'Leaflyte capture token not found. Open the Leaflyte desktop app (or run npm run dev), then retry.'
+      );
+    }
+    return null;
+  }
+
   try {
-    const res = await fetch(vaultUrl, { method: 'GET' });
+    const res = await fetch(vaultUrl, { method: 'GET', headers: captureHeaders() });
     const data = (await res.json().catch(() => ({}))) as { path?: string; error?: string };
     if (!res.ok || !data.path) {
       throw new Error(data.error || res.statusText || 'Could not read active vault');
@@ -72,7 +122,7 @@ async function ensureLinkedVault(): Promise<LinkedVault> {
   const vault = await refreshLinkedVault(true);
   if (!vault) {
     throw new Error(
-      'Leaflyte is not connected. Start Leaflyte, open a vault, then run “Leaflyte: Connect to Vault”.'
+      'Leaflyte is not connected. Open Leaflyte, then run “Leaflyte: Connect to Vault”.'
     );
   }
   return vault;
@@ -90,7 +140,7 @@ async function postCapture(body: {
 
   const res = await fetch(captureUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: captureHeaders(),
     body: JSON.stringify({ ...body, folder: body.folder ?? captureFolder })
   });
   const data = (await res.json().catch(() => ({}))) as {
@@ -200,7 +250,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('leaflyte.captureFile', () => void captureFile()),
     vscode.commands.registerCommand('leaflyte.refreshVault', () => void refreshLinkedVault(false)),
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration('leaflyte.captureUrl')) {
+      if (
+        event.affectsConfiguration('leaflyte.captureUrl') ||
+        event.affectsConfiguration('leaflyte.captureToken')
+      ) {
         linkedVault = null;
         void refreshLinkedVault(true);
       }

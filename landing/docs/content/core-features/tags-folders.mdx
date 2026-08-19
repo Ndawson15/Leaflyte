@@ -1,0 +1,45 @@
+---
+title: Tags & Folders
+description: Organize notes with directories on disk and inline #tags anywhere in any file.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte uses **folders** for hierarchy (real directories) and **tags** for cross-cutting labels (`#word` tokens parsed from file content).
+
+## Folders
+
+- The sidebar reflects the vault directory tree
+- Drag-and-drop moves files on disk
+- Ignored paths: `.git`, `node_modules`, dotfiles, `.gitignore` patterns
+
+### Recommended structures
+
+| Pattern | Use case |
+|---------|----------|
+| `inbox/` | Quick captures, triage weekly |
+| `projects/<name>/` | One folder per initiative with an index note |
+| `daily/YYYY-MM-DD.md` | Daily notes |
+| `reference/` | Long-lived docs |
+
+## Tags
+
+Write `#design`, `#bug`, or `#v0.3` anywhere — inside markdown, code comments, or HTML. Tags appear in the backlinks panel for the open file.
+
+<Callout variant="tip">
+Tags are not a separate database — they are extracted by scanning file text. Renaming a tag means find-and-replace across the vault.
+</Callout>
+
+## Tags vs folders
+
+| Folders | Tags |
+|---------|------|
+| One parent path | Many tags per file |
+| Good for project boundaries | Good for status, topic, priority |
+| Visible in file path | Visible in backlinks panel and search |
+
+## Search by tag
+
+Quick switcher scoring boosts tag matches. Combine with `ext:md #roadmap` style queries in content search.

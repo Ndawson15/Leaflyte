@@ -1,0 +1,69 @@
+---
+title: Creating & Organizing Notes
+description: Vault folders, wikilinks, workspaces, tabs, and file operations in Leaflyte.
+category: Tutorial
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte mirrors your vault as a folder tree. Creating, renaming, and moving items updates real files on disk — compatible with git, Obsidian, or any file sync tool you add later.
+
+## Vault layout
+
+```text
+vault/
+├── inbox/
+├── projects/
+│   └── leaflyte/
+│       ├── roadmap.md
+│       └── api-notes.ts
+└── daily/
+    └── 2026-08-19.md
+```
+
+<Callout variant="note">
+External edits are detected. The desktop app watches the filesystem; web dev polls every few seconds.
+</Callout>
+
+## Create files and folders
+
+1. **New file** — `Cmd+N` / `Ctrl+N`, or sidebar actions. Files are created in the currently selected folder.
+
+2. **New folder** — Use the sidebar folder action. Leaflyte creates the directory immediately on disk.
+
+3. **Rename or move** — Context menu or drag in the sidebar. Wikilinks and embeds update when paths change.
+
+## Wikilinks and backlinks
+
+Link notes with `[[target]]` or `[[folder/note|display label]]` inside any file type — markdown, SQL comments, HTML, etc.
+
+The **backlinks panel** (right side) shows:
+
+- Notes that link **to** the open file
+- Notes the open file links **out** to
+- **Tags** extracted from the file
+
+## Workspaces
+
+**Settings → Workspaces** lets you register multiple vault folders. Each workspace keeps its own tabs and navigation state in localStorage.
+
+1. **Add workspace** — Choose a folder path (desktop) or path string (web dev)
+2. **Switch** — Workspace switcher in the sidebar header
+3. **Remove** — Removes from Leaflyte only; does not delete files on disk
+
+## Tabs and navigation
+
+| Action | Shortcut |
+|--------|----------|
+| Quick switcher | `Cmd+K` / `Ctrl+K` |
+| Command palette | `Cmd+Shift+P` |
+| Close tab | `Cmd+W` |
+
+<Figure src="/docs/assets/app-screenshot.png" alt="Leaflyte editor" caption="Sidebar vault tree, Monaco editor, and split markdown preview." />
+
+## Related
+
+- [Tags & Folders](/core-features/tags-folders/)
+- [Search](/core-features/search/)
+- [Attachments](/core-features/attachments/)

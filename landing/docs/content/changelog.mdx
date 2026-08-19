@@ -1,0 +1,45 @@
+---
+title: Changelog
+description: Release notes and version history for Leaflyte.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## v0.3.0
+
+- **VS Code capture in desktop app** — production builds run a localhost capture API on `127.0.0.1:1420` while Leaflyte is open (no `npm run dev` required)
+- **Capture auth token** — random bearer token stored in app config; extension reads it automatically
+- **`GET /api/vault`** — vault discovery endpoint for the capture extension
+- Documentation site at [leaflyte.app/docs](https://leaflyte.app/docs)
+
+## v0.2.9
+
+- Desktop builds for macOS, Windows, and Linux via Tauri
+- Auto-updater from leaflyte.app
+- GFM markdown preview with Mermaid and task lists
+- Split / read / edit markdown views (`Cmd+Shift+E`)
+- Local LLM via Ollama, LM Studio, or any OpenAI-compatible endpoint
+- Anthropic and OpenAI providers with edit approval flow
+- Vault search with `ext:`, `path:`, and regex filters
+- Find-and-replace across vault with per-file preview
+- VS Code / Cursor capture extension (`Cmd+Shift+L`)
+- CFML custom Monaco grammar
+- Workspaces — multiple vault folders
+- Four themes with custom color overrides
+
+## v0.2.x (earlier)
+
+- Initial Tauri desktop packaging
+- Monaco editor with 100+ language mappings
+- Wikilinks, backlinks, and tags
+- Quick switcher and command palette
+
+## Upcoming
+
+- Self-hosted sync server and optional Docker release
+- Tailscale-friendly remote access docs
+- SQLite FTS5 for large vault search
+- Native multi-user auth for self-hosted
+- Mobile-friendly PWA once sync exists
+
+Full release artifacts: [GitHub Releases](https://github.com/Ndawson15/Leaflyte/releases)

@@ -1,0 +1,36 @@
+---
+title: Authentication
+description: Secure self-hosted Leaflyte — reverse proxy auth today, native multi-user on the roadmap.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte **desktop** runs locally — no login required. **Web/self-hosted** instances have no built-in user accounts in v0.2.x. Authentication belongs at the reverse proxy or identity provider.
+
+<Callout variant="warning">
+Never expose `npm run dev` or `next start` directly to the internet without TLS and authentication.
+</Callout>
+
+## Recommended patterns
+
+| Approach | Best for |
+|----------|----------|
+| **Caddy basic auth** | Single user, homelab |
+| **Authelia / Authentik** | SSO, MFA, multiple users |
+| **Cloudflare Access** | Remote team without VPN |
+| **Tailscale Serve** | Personal devices on tailnet |
+| **VPN only** | No public URL |
+
+## Desktop app
+
+OS user session protects the app implicitly. Disk encryption (FileVault, BitLocker) protects vault data at rest.
+
+## Capture API
+
+`POST /api/capture` accepts writes when the dev server is reachable. On LAN deployments, restrict port 1420 to trusted IPs or bind to localhost and tunnel via Tailscale.
+
+## Future native auth
+
+Multi-user accounts and permissions are planned for self-hosted sync — see [Multi-user Setup](/accounts-access/multi-user-setup/). Until then, one reverse-proxy user maps to one shared vault.

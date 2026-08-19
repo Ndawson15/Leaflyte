@@ -1,0 +1,56 @@
+---
+title: Settings Reference
+description: Every Leaflyte settings panel — General, Workspaces, Theme, AI, and Shortcuts.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Open **Settings** from the command palette or sidebar. All settings persist to localStorage unless noted.
+
+## General
+
+| Setting | Description |
+|---------|-------------|
+| App version | Current Leaflyte version; desktop shows updater status |
+| Markdown toolbar | Show/hide formatting toolbar in markdown edit mode |
+| Current workspace | Name and path of active vault |
+
+## Workspaces
+
+| Action | Description |
+|--------|-------------|
+| Add workspace | Register another vault folder |
+| Switch | Change active vault |
+| Remove | Unregister workspace (files remain on disk) |
+
+## Theme
+
+- Preset selection (Carbon, Midnight, Paper, Sepia)
+- Per-color overrides
+- Color file icons toggle
+
+## AI
+
+| Setting | Description |
+|---------|-------------|
+| Provider | Off, Local/OpenAI-compatible, Anthropic, OpenAI |
+| Local base URL | e.g. `http://localhost:11434/v1` (Ollama) |
+| API keys | Stored locally only — never sent to Leaflyte servers |
+| Model | Selected per provider from live model list |
+| Allow edits | AI may propose `leaflyte-write` blocks requiring approval |
+
+Edits always flow through **preview → approve / revert**.
+
+## Shortcuts
+
+Remap keybindings in **Settings → Shortcuts**. Defaults include:
+
+| Action | Default |
+|--------|---------|
+| Quick switcher | `Cmd+K` |
+| Command palette | `Cmd+Shift+P` |
+| New file | `Cmd+N` |
+| Save | `Cmd+S` |
+| Toggle markdown view | `Cmd+Shift+E` |

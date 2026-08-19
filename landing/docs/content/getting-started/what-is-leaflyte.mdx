@@ -1,0 +1,45 @@
+---
+title: What is Leaflyte
+description: A local-first notes app where every note is a real file — edited with Monaco, linked with wikilinks, and owned by you.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte is a local-first notes app inspired by Obsidian, built for developers and power users who want **real files on disk** instead of a proprietary database. Your vault is a folder — markdown, SQL, HTML, Python, CFML, or anything else — edited with the same Monaco engine that powers VS Code.
+
+Unlike cloud note apps, Leaflyte never uploads your vault. The desktop app reads and writes files directly through Tauri/Rust. In development mode, a local Next.js server on port **1420** exposes the same UI and HTTP APIs.
+
+<Callout variant="note">
+Leaflyte is actively developed (v0.2.x). Self-hosted sync and official Docker images are on the roadmap — today the primary experience is the **desktop app** plus optional local web dev.
+</Callout>
+
+## Who Leaflyte is for
+
+- **Developers** who live in Monaco/VS Code and want notes beside code snippets with correct syntax highlighting
+- **Technical writers** who need GFM markdown, Mermaid diagrams, and split preview
+- **Obsidian refugees** who want wikilinks, backlinks, and tags without a subscription
+- **Homelab users** planning to self-host a web UI behind a reverse proxy (see [Self-Hosting Requirements](/getting-started/self-hosting-requirements/))
+
+## Core ideas
+
+| Concept | What it means |
+|---------|---------------|
+| **Vault** | A folder on disk. Default `./vault` in dev; `Documents/Leaflyte` in packaged desktop builds |
+| **Wikilinks** | `[[note-name]]` or `[[path/note\|label]]` in any file type |
+| **Tags** | `#tag` anywhere in a file — surfaced in the backlinks panel |
+| **Workspaces** | Multiple vault folders, each with its own tabs and session state |
+| **Real extensions** | `.sql`, `.ts`, `.cfm`, `.py` — not fenced code blocks in markdown |
+
+## Desktop vs web
+
+| Mode | How to run | File I/O |
+|------|------------|----------|
+| **Desktop (Tauri)** | Install from [leaflyte.app](https://leaflyte.app) or `npm run tauri:dev` | Rust commands — no Node at runtime |
+| **Web dev** | `npm run dev` → `http://127.0.0.1:1420` | Next.js API routes under `/api/*` |
+| **LAN dev** | `npm run dev:lan` | Same APIs, bound to `0.0.0.0` for capture from other machines |
+
+## What's next
+
+Leaflyte's roadmap includes optional self-hosted sync, Tailscale-friendly remote access, and SQLite FTS5 for very large vaults. See [Changelog](/changelog/) for release history.

@@ -23,6 +23,25 @@ if (vite.status !== 0) {
   process.exit(vite.status || 1);
 }
 
+console.log('Building documentation site…');
+const docsRoot = join(landingRoot, 'docs');
+const docsBuild = spawnSync('npm', ['run', 'build'], {
+  cwd: docsRoot,
+  stdio: 'inherit',
+  shell: true,
+});
+
+if (docsBuild.status !== 0) {
+  console.error('Docs build failed');
+  process.exit(docsBuild.status || 1);
+}
+
+const docsOut = join(docsRoot, 'out');
+if (existsSync(docsOut)) {
+  cpSync(docsOut, join(out, 'docs'), { recursive: true });
+  console.log('Copied docs export → build/docs/');
+}
+
 for (const path of staticPaths) {
   const source = join(landingRoot, path);
   if (!existsSync(source)) continue;

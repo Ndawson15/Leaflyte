@@ -1,0 +1,34 @@
+---
+title: Database Configuration
+description: How Leaflyte stores data — plain files today, optional database for future multi-user sync.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte does **not** use a database for note storage. Your vault is a directory of files. App preferences, workspaces, AI settings, and chat history live in **browser localStorage** (or Tauri-managed storage on desktop).
+
+<Callout variant="note">
+There is no database to install or configure for the current release. This page documents today's model and planned direction.
+</Callout>
+
+## Current storage model
+
+| Data | Location |
+|------|----------|
+| Notes, attachments | Vault folder on disk (`VAULT_DIR`) |
+| Theme, keymaps, AI keys | localStorage |
+| Workspace list & tabs | localStorage |
+| AI chat history | localStorage |
+| Desktop vault path | `~/Library/Application Support/com.leaflyte.desktop/vault-path.txt` (macOS) |
+
+## Indexing
+
+Search and backlinks build an in-memory index by scanning vault files. A `.leaflyte-index` folder may appear for caches — safe to delete; it rebuilds on launch.
+
+## Future: optional database
+
+Planned self-hosted sync may introduce PostgreSQL or SQLite for user accounts and sync metadata — **not** for replacing file-based note bodies. Notes will remain plain files you can `git clone`.
+
+When database support ships, configuration will appear here and in [Environment Variables](/deployment/environment-variables/).

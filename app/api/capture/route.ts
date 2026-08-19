@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isCaptureAuthorized, unauthorizedCaptureResponse } from '@/lib/captureAuth';
 import { exists, getVaultDir, writeFile } from '@/lib/vault';
 import { extensionForLanguage } from '@/lib/languageMap';
 
@@ -47,7 +48,8 @@ function uniquePath(folder: string, stem: string, ext: string): string {
   return `${prefix}${stem}-${Date.now()}.${ext}`;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isCaptureAuthorized(req)) return unauthorizedCaptureResponse();
   return NextResponse.json({
     ok: true,
     message: 'Leaflyte capture is ready'
@@ -55,6 +57,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isCaptureAuthorized(req)) return unauthorizedCaptureResponse();
+
   try {
     const body = await req.json();
     const content = typeof body?.content === 'string' ? body.content : '';

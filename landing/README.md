@@ -4,6 +4,8 @@ React marketing site for [Leaflyte](https://github.com/Ndawson15/Leaflyte). Depl
 
 Built with **React 16.14** + **framer-motion 6.5.1** (v7+ requires React 18). Code avoids React 18-only APIs (`useId`, concurrent Suspense, etc.).
 
+Documentation lives at **`/docs`** — a separate Next.js static export in [`docs/`](docs/). It is built automatically and copied into `build/docs/` during `npm run build`.
+
 ## Hostinger (Node.js web app → GitHub)
 
 In hPanel → your site → **Deployments** / build settings:

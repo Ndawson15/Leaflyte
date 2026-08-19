@@ -1,0 +1,69 @@
+---
+title: Reverse Proxy / SSL Setup
+description: Put Leaflyte behind Caddy, nginx, or Traefik for HTTPS and authentication.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte's web/dev server has **no built-in authentication**. For any network beyond localhost, terminate TLS and enforce auth at the reverse proxy.
+
+## Caddy (recommended)
+
+```caddy
+notes.example.com {
+  reverse_proxy leaflyte:4000
+}
+```
+
+Caddy obtains and renews Let's Encrypt certificates automatically.
+
+### With basic auth
+
+```caddy
+notes.example.com {
+  basicauth {
+    admin $2a$14$...  # caddy hash-password
+  }
+  reverse_proxy 127.0.0.1:4000
+}
+```
+
+## nginx
+
+```nginx
+server {
+  listen 443 ssl http2;
+  server_name notes.example.com;
+
+  ssl_certificate     /etc/letsencrypt/live/notes.example.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/notes.example.com/privkey.pem;
+
+  location / {
+    proxy_pass http://127.0.0.1:4000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+```
+
+## WebSocket / hot reload
+
+Development (`npm run dev`) uses HMR WebSockets. Production `next start` serves static+SSR without HMR — standard reverse-proxy headers above are sufficient.
+
+## Tailscale
+
+For personal remote access, serve Leaflyte on your tailnet without public DNS:
+
+```bash
+tailscale serve --bg --https=443 http://127.0.0.1:4000
+```
+
+## Related
+
+- [Authentication](/accounts-access/authentication/) — Auth strategies
+- [Self-Hosting Requirements](/getting-started/self-hosting-requirements/)

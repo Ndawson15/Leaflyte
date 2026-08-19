@@ -2,7 +2,7 @@
   "name": "leaflyte-capture",
   "displayName": "Leaflyte Capture",
   "description": "Send the current selection (or file) into your Leaflyte vault as a real note with the right extension.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "leaflyte",
   "icon": "icon.png",
   "galleryBanner": {
@@ -55,6 +55,11 @@
           "type": "string",
           "default": "captures",
           "description": "Subfolder inside the active vault for captured files."
+        },
+        "leaflyte.captureToken": {
+          "type": "string",
+          "default": "",
+          "description": "Optional override for the Leaflyte capture token. Leave empty to read from the Leaflyte app config directory automatically."
         }
       }
     }

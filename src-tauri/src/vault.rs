@@ -1,7 +1,7 @@
 use serde::Serialize;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 const IGNORE: &[&str] = &[".git", "node_modules", ".DS_Store", ".leaflyte-index"];
 const APP_CONFIG_DIR: &str = "com.leaflyte.desktop";
@@ -33,8 +33,12 @@ impl VaultState {
     }
 }
 
-fn config_dir() -> Option<PathBuf> {
+pub fn app_config_dir() -> Option<PathBuf> {
     dirs::data_dir().map(|dir| dir.join(APP_CONFIG_DIR))
+}
+
+fn config_dir() -> Option<PathBuf> {
+    app_config_dir()
 }
 
 fn persisted_vault_config_path() -> Option<PathBuf> {
@@ -101,7 +105,7 @@ fn default_documents_root() -> PathBuf {
     fs::canonicalize(&p).unwrap_or(p)
 }
 
-fn root_of(state: &VaultState) -> Result<PathBuf, String> {
+pub fn root_of(state: &VaultState) -> Result<PathBuf, String> {
     Ok(state.root.lock().map_err(|e| e.to_string())?.clone())
 }
 
@@ -160,7 +164,7 @@ fn normalize(path: &Path) -> PathBuf {
     out
 }
 
-fn resolve_safe(root: &Path, rel: &str) -> Result<PathBuf, String> {
+pub fn resolve_safe(root: &Path, rel: &str) -> Result<PathBuf, String> {
     let cleaned = rel.replace('\\', "/");
     let cleaned = cleaned.trim_start_matches('/');
     let abs = normalize(&root.join(cleaned));
@@ -250,12 +254,12 @@ fn list_files_at(
 }
 
 #[tauri::command]
-pub fn get_vault_path(state: tauri::State<VaultState>) -> Result<String, String> {
+pub fn get_vault_path(state: tauri::State<'_, Arc<VaultState>>) -> Result<String, String> {
     Ok(root_of(&state)?.to_string_lossy().to_string())
 }
 
 #[tauri::command]
-pub fn set_vault_path(state: tauri::State<VaultState>, path: String) -> Result<String, String> {
+pub fn set_vault_path(state: tauri::State<'_, Arc<VaultState>>, path: String) -> Result<String, String> {
     let requested = PathBuf::from(path.trim());
     if !requested.is_dir() {
         return Err("That folder does not exist".into());
@@ -277,7 +281,7 @@ pub fn set_vault_path(state: tauri::State<VaultState>, path: String) -> Result<S
 }
 
 #[tauri::command]
-pub fn abs_path(state: tauri::State<VaultState>, path: String) -> Result<String, String> {
+pub fn abs_path(state: tauri::State<'_, Arc<VaultState>>, path: String) -> Result<String, String> {
     let root = root_of(&state)?;
     let abs = resolve_safe(&root, &path)?;
     Ok(abs.to_string_lossy().to_string())
@@ -293,7 +297,7 @@ pub async fn pick_vault_folder() -> Result<Option<String>, String> {
 }
 
 #[tauri::command]
-pub fn reveal_path(state: tauri::State<VaultState>, path: String) -> Result<(), String> {
+pub fn reveal_path(state: tauri::State<'_, Arc<VaultState>>, path: String) -> Result<(), String> {
     let root = root_of(&state)?;
     let abs = resolve_safe(&root, &path)?;
     if !abs.exists() {
@@ -326,7 +330,7 @@ pub fn reveal_path(state: tauri::State<VaultState>, path: String) -> Result<(), 
 }
 
 #[tauri::command]
-pub fn list_tree(state: tauri::State<VaultState>) -> Result<Vec<TreeNode>, String> {
+pub fn list_tree(state: tauri::State<'_, Arc<VaultState>>) -> Result<Vec<TreeNode>, String> {
     let root = root_of(&state)?;
     fs::create_dir_all(&root).map_err(|e| e.to_string())?;
     let gitignore = load_gitignore(&root);
@@ -334,7 +338,7 @@ pub fn list_tree(state: tauri::State<VaultState>) -> Result<Vec<TreeNode>, Strin
 }
 
 #[tauri::command]
-pub fn list_files(state: tauri::State<VaultState>) -> Result<Vec<String>, String> {
+pub fn list_files(state: tauri::State<'_, Arc<VaultState>>) -> Result<Vec<String>, String> {
     let root = root_of(&state)?;
     fs::create_dir_all(&root).map_err(|e| e.to_string())?;
     let gitignore = load_gitignore(&root);
@@ -344,7 +348,7 @@ pub fn list_files(state: tauri::State<VaultState>) -> Result<Vec<String>, String
 }
 
 #[tauri::command]
-pub fn read_file(state: tauri::State<VaultState>, path: String) -> Result<String, String> {
+pub fn read_file(state: tauri::State<'_, Arc<VaultState>>, path: String) -> Result<String, String> {
     let root = root_of(&state)?;
     let abs = resolve_safe(&root, &path)?;
     fs::read_to_string(abs).map_err(|e| e.to_string())
@@ -352,7 +356,7 @@ pub fn read_file(state: tauri::State<VaultState>, path: String) -> Result<String
 
 #[tauri::command]
 pub fn write_file(
-    state: tauri::State<VaultState>,
+    state: tauri::State<'_, Arc<VaultState>>,
     path: String,
     content: String,
 ) -> Result<WriteResult, String> {
@@ -367,7 +371,7 @@ pub fn write_file(
 }
 
 #[tauri::command]
-pub fn delete_path(state: tauri::State<VaultState>, path: String) -> Result<(), String> {
+pub fn delete_path(state: tauri::State<'_, Arc<VaultState>>, path: String) -> Result<(), String> {
     let root = root_of(&state)?;
     let abs = resolve_safe(&root, &path)?;
     let meta = fs::metadata(&abs).map_err(|e| e.to_string())?;
@@ -380,7 +384,7 @@ pub fn delete_path(state: tauri::State<VaultState>, path: String) -> Result<(), 
 
 #[tauri::command]
 pub fn move_path(
-    state: tauri::State<VaultState>,
+    state: tauri::State<'_, Arc<VaultState>>,
     from: String,
     to: String,
 ) -> Result<String, String> {

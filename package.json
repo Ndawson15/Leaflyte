@@ -1,10 +1,10 @@
 {
   "name": "leaflyte",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 127.0.0.1 -p 1420",
-    "dev:lan": "next dev -H 0.0.0.0 -p 1420",
+    "dev": "node scripts/ensure-capture-token.mjs && next dev -H 127.0.0.1 -p 1420",
+    "dev:lan": "node scripts/ensure-capture-token.mjs && next dev -H 0.0.0.0 -p 1420",
     "build": "next build",
     "build:tauri": "node scripts/build-tauri.mjs",
     "start": "next start -p 4000",

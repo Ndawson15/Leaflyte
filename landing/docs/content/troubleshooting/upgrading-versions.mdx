@@ -1,0 +1,44 @@
+---
+title: Upgrading Versions
+description: Upgrade Leaflyte desktop and self-hosted deployments safely.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Upgrading should never mutate vault file formats — back up anyway before major jumps.
+
+## Desktop auto-updater
+
+Packaged builds check `https://leaflyte.app/updates/latest.json`. When an update is available, the app prompts to download and restart.
+
+Manual install: download the latest .dmg / .exe from [leaflyte.app](https://leaflyte.app) and install over the existing app.
+
+## From source (dev)
+
+```bash
+git pull
+npm ci
+npm run dev   # or npm run tauri:build
+```
+
+## Self-hosted Docker
+
+```bash
+git pull
+docker compose build --no-cache
+docker compose up -d
+```
+
+Vault volume persists across container replacements.
+
+## Rollback
+
+1. Reinstall the previous desktop build from GitHub Releases
+2. Or checkout an older git tag and rebuild
+3. Vault folder is unchanged — no downgrade migration needed
+
+## Breaking changes
+
+Review [Changelog](/changelog/) before upgrading across multiple minor versions. Settings in localStorage may reset if keys rename — export screenshots of AI settings if needed.

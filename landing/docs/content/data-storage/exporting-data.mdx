@@ -1,0 +1,39 @@
+---
+title: Exporting Your Data
+description: Your notes are already plain files — copy, zip, or sync the vault folder.
+category: Guide
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte has no proprietary export format. **Exporting = copying your vault folder.**
+
+## Full vault export
+
+```bash
+tar -czvf leaflyte-vault-backup.tar.gz -C /path/to/vault .
+```
+
+Or use Finder/Explorer to copy the folder to USB, cloud drive, or another machine.
+
+## Single-note export
+
+Right-click a file in the sidebar → reveal in Finder/Explorer → copy anywhere. Markdown, PDF, images — all standard files.
+
+## Migrating to Obsidian / Logseq
+
+1. Point the other app at the same folder, or
+2. Copy `.md` files into that app's vault
+
+Wikilinks `[[note]]` syntax is compatible with Obsidian. Tags `#word` work similarly.
+
+## Migrating from Obsidian
+
+1. **Settings → Workspaces → Add** and select your Obsidian vault folder
+2. Leaflyte reads existing `.md` files immediately
+3. Review embed syntax — Leaflyte uses `![[file]]` like Obsidian
+
+<Callout variant="tip">
+Obsidian plugins that store metadata in `.obsidian/` are ignored by Leaflyte — your note content is unaffected.
+</Callout>

@@ -1,0 +1,54 @@
+---
+title: Environment Variables
+description: Environment variables for Leaflyte web/server deployments and build tooling.
+category: Reference
+lastUpdated: August 19, 2026
+---
+
+## Overview
+
+Leaflyte stores user preferences and AI keys in **browser localStorage**, not server environment variables. Server env vars mainly control vault path and build behavior.
+
+## Runtime variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VAULT_DIR` | `./vault` | Absolute or relative path to the notes vault on disk |
+| `NODE_ENV` | `development` | `production` for `next start` deployments |
+| `PORT` | `4000` | Port for `next start` (see `package.json`) |
+
+### Example `.env.local`
+
+```bash
+VAULT_DIR=/data/leaflyte/vault
+```
+
+Copy from `.env.example` at the repo root. Keep `.env.local` out of git.
+
+## Build / Tauri variables
+
+| Variable | Purpose |
+|----------|---------|
+| `TAURI=1` | Enables static export for Tauri desktop builds |
+| `NEXT_DIST_DIR` | Custom Next.js output directory |
+| `TAURI_SIGNING_PRIVATE_KEY` | Desktop updater signing (release builds) |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | Password for signing key, if encrypted |
+
+## What is NOT configured via env
+
+<Callout variant="warning">
+Never put AI API keys in server environment variables. Configure them in **Settings → AI** inside the app — they are stored in localStorage only.
+</Callout>
+
+- Anthropic / OpenAI / local LLM endpoints
+- Theme and editor preferences
+- Workspace list and tab state
+
+## Docker mapping
+
+```yaml
+environment:
+  VAULT_DIR: /vault
+volumes:
+  - /host/path/to/vault:/vault
+```
